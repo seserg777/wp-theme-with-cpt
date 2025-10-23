@@ -38,13 +38,19 @@ class PlacesPostType extends PostTypeBase
             'menu_icon'           => 'dashicons-location',
             'supports'            => ['title', 'editor', 'thumbnail', 'excerpt'],
             'taxonomies'          => ['places_category'],
-            'rewrite'             => ['slug' => 'places'],
+            'rewrite'             => [
+                'slug'       => 'places',
+                'with_front' => false,
+                'pages'      => true,
+                'feeds'      => true,
+            ],
             'has_archive'         => true,
             'show_in_rest'        => true,
             'publicly_queryable'  => true,
             'capability_type'     => 'post',
             'hierarchical'        => false,
             'menu_position'       => 6,
+            'show_in_nav_menus'   => true,
         ];
     }
 
@@ -68,7 +74,12 @@ class PlacesPostType extends PostTypeBase
         
         // AJAX handlers for frontend editing.
         add_action('wp_ajax_update_place', [$this, 'ajaxUpdatePlace']);
-        add_action('wp_ajax_get_place_data', [$this, 'ajaxGetPlaceData']);
+        
+        // Flush rewrite rules on theme activation.
+        add_action('after_switch_theme', [$this, 'flushRewriteRules']);
+        
+        // Flush rewrite rules on init to ensure they are registered.
+        add_action('init', [$this, 'maybeFlushRewriteRules'], 20);
     }
 
     /**
@@ -98,11 +109,38 @@ class PlacesPostType extends PostTypeBase
             'show_ui'           => true,
             'show_admin_column' => true,
             'query_var'         => true,
-            'rewrite'           => ['slug' => 'places-category'],
+            'rewrite'           => [
+                'slug'       => 'places-category',
+                'with_front' => false,
+                'hierarchical' => true,
+            ],
             'show_in_rest'      => true,
         ];
 
         register_taxonomy('places_category', [$this->postType], $args);
+    }
+
+    /**
+     * Flush rewrite rules
+     *
+     * @return void
+     */
+    public function flushRewriteRules(): void
+    {
+        flush_rewrite_rules();
+    }
+
+    /**
+     * Maybe flush rewrite rules if needed
+     *
+     * @return void
+     */
+    public function maybeFlushRewriteRules(): void
+    {
+        $rules = get_option('rewrite_rules');
+        if (!isset($rules['^places/([^/]+)/edit/?$'])) {
+            flush_rewrite_rules();
+        }
     }
 
     /**
@@ -317,8 +355,8 @@ class PlacesPostType extends PostTypeBase
      */
     public static function getFullAddress(int $postId): string
     {
-        $street = get_post_meta($postId, '_places_street', true);
-        $number = get_post_meta($postId, '_places_number', true);
+        $street = get_post_meta($postId, '_place_street', true);
+        $number = get_post_meta($postId, '_place_number', true);
         
         if (empty($street) || empty($number)) {
             return '';
@@ -336,10 +374,10 @@ class PlacesPostType extends PostTypeBase
     public static function getPlaceDetails(int $postId): array
     {
         return [
-            'street' => get_post_meta($postId, '_places_street', true),
-            'number' => get_post_meta($postId, '_places_number', true),
-            'nip'    => get_post_meta($postId, '_places_nip', true),
-            'region' => get_post_meta($postId, '_places_region', true),
+            'street' => get_post_meta($postId, '_place_street', true),
+            'number' => get_post_meta($postId, '_place_number', true),
+            'nip'    => get_post_meta($postId, '_place_nip', true),
+            'region' => get_post_meta($postId, '_place_region', true),
         ];
     }
 
@@ -461,63 +499,27 @@ class PlacesPostType extends PostTypeBase
                     <?php esc_html_e('View', 'mytheme'); ?>
                 </a>
                 <?php if (current_user_can('edit_post', $postId)) : ?>
-                    <button type="button" 
-                            class="places-edit-btn" 
-                            data-post-id="<?php echo esc_attr($postId); ?>"
-                            title="<?php esc_attr_e('Edit', 'mytheme'); ?>">
+                    <?php 
+                    $post_slug = get_post_field('post_name', $postId);
+                    $edit_url = home_url('/places/' . $post_slug . '/edit/');
+                    
+                    // Debug: Log the URL being generated
+                    if (defined('WP_DEBUG') && WP_DEBUG) {
+                        error_log("Edit URL for post {$postId}: {$edit_url}");
+                    }
+                    ?>
+                    <a href="<?php echo esc_url($edit_url); ?>" 
+                       class="places-edit-btn" 
+                       title="<?php esc_attr_e('Edit', 'mytheme'); ?>"
+                       data-debug-url="<?php echo esc_attr($edit_url); ?>">
                         <?php esc_html_e('Edit', 'mytheme'); ?>
-                    </button>
+                    </a>
                 <?php endif; ?>
             </td>
         </tr>
         <?php
     }
 
-    /**
-     * AJAX handler for getting place data
-     *
-     * @return void
-     */
-    public function ajaxGetPlaceData(): void
-    {
-        // Verify nonce.
-        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'mytheme-nonce')) {
-            wp_send_json_error(['message' => __('Security check failed', 'mytheme')]);
-            return;
-        }
-
-        $postId = isset($_POST['post_id']) ? absint($_POST['post_id']) : 0;
-
-        if (!$postId) {
-            wp_send_json_error(['message' => __('Invalid post ID', 'mytheme')]);
-            return;
-        }
-
-        // Check permissions.
-        if (!current_user_can('edit_post', $postId)) {
-            wp_send_json_error(['message' => __('You do not have permission to edit this place', 'mytheme')]);
-            return;
-        }
-
-        $post = get_post($postId);
-        if (!$post || $post->post_type !== $this->postType) {
-            wp_send_json_error(['message' => __('Place not found', 'mytheme')]);
-            return;
-        }
-
-        $placeDetails = self::getPlaceDetails($postId);
-
-        $data = [
-            'id'     => $postId,
-            'title'  => get_the_title($postId),
-            'street' => $placeDetails['street'],
-            'number' => $placeDetails['number'],
-            'region' => $placeDetails['region'],
-            'nip'    => $placeDetails['nip'],
-        ];
-
-        wp_send_json_success($data);
-    }
 
     /**
      * AJAX handler for updating place
@@ -526,8 +528,16 @@ class PlacesPostType extends PostTypeBase
      */
     public function ajaxUpdatePlace(): void
     {
+        // Debug: Log the request
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('ajaxUpdatePlace called with POST data: ' . print_r($_POST, true));
+        }
+        
         // Verify nonce.
         if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'mytheme-nonce')) {
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('Nonce verification failed');
+            }
             wp_send_json_error(['message' => __('Security check failed', 'mytheme')]);
             return;
         }

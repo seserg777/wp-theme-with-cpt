@@ -109,53 +109,40 @@ class Theme
             true
         );
 
-        // Enqueue places styles and scripts on places pages.
-        if (is_post_type_archive('places') || 
-            is_singular('places') || 
-            is_tax('places_category')) {
-            wp_enqueue_style(
-                'mytheme-places',
-                get_template_directory_uri() . '/dist/css/places-styles.min.css',
-                [],
-                '1.0.0'
-            );
-
-            // Enqueue places script for load more functionality.
-            if (is_post_type_archive('places') || is_tax('places_category')) {
+            // Enqueue places styles and scripts on places pages.
+            if (is_post_type_archive('places') || 
+                is_singular('places') || 
+                is_tax('places_category')) {
                 wp_enqueue_style(
-                    'mytheme-places-modal',
-                    get_template_directory_uri() . '/dist/css/places-modal.min.css',
-                    ['mytheme-places'],
+                    'mytheme-places',
+                    get_template_directory_uri() . '/dist/css/places-styles.min.css',
+                    [],
                     '1.0.0'
                 );
 
-                wp_enqueue_script(
-                    'mytheme-places',
-                    get_template_directory_uri() . '/dist/js/places.min.js',
-                    ['jquery', 'mytheme-main'],
-                    '1.0.0',
-                    true
-                );
+                // Enqueue places script for load more functionality.
+                if (is_post_type_archive('places') || is_tax('places_category')) {
+                    wp_enqueue_script(
+                        'mytheme-places',
+                        get_template_directory_uri() . '/dist/js/places.min.js',
+                        ['jquery', 'mytheme-main'],
+                        '1.0.0',
+                        true
+                    );
+                }
             }
-        }
 
         // Localize script for AJAX.
         wp_localize_script(
             'mytheme-main',
             'mythemeData',
             [
-                'ajaxUrl' => admin_url('admin-ajax.php'),
-                'nonce'   => wp_create_nonce('mytheme-nonce'),
-                'i18n'    => [
-                    'editPlace' => __('Edit Place', 'mytheme'),
-                    'name'      => __('Name', 'mytheme'),
-                    'street'    => __('Street', 'mytheme'),
-                    'number'    => __('Number', 'mytheme'),
-                    'region'    => __('Region', 'mytheme'),
-                    'nip'       => __('NIP', 'mytheme'),
+                'ajaxUrl'  => admin_url('admin-ajax.php'),
+                'siteUrl'  => home_url(),
+                'nonce'    => wp_create_nonce('mytheme-nonce'),
+                'i18n'     => [
                     'save'      => __('Save', 'mytheme'),
                     'saving'    => __('Saving...', 'mytheme'),
-                    'cancel'    => __('Cancel', 'mytheme'),
                 ],
             ]
         );

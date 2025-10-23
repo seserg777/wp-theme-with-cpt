@@ -17,7 +17,6 @@ module.exports = {
         'admin-styles': './src/scss/admin.scss',
         'places-admin': './src/scss/places-admin.scss',
         'places-styles': './src/scss/places.scss',
-        'places-modal': './src/scss/places-modal.scss',
     },
     
     output: {

@@ -65,12 +65,27 @@ class Autoloader
         $classFile = strtolower(str_replace('_', '-', $relativeClass));
         $classFile = 'class-' . $classFile . '.php';
 
-        // Build full file path.
-        $file = $this->themePath . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . $classFile;
+        // Try different possible locations.
+        $possiblePaths = [
+            $this->themePath . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . $classFile,
+            $this->themePath . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'post-types' . DIRECTORY_SEPARATOR . $classFile,
+        ];
+
+        // Debug: Log what we're looking for.
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log("Autoloader looking for class: $class");
+            error_log("Looking for file: $classFile");
+            foreach ($possiblePaths as $path) {
+                error_log("Checking path: $path - " . (file_exists($path) ? 'EXISTS' : 'NOT FOUND'));
+            }
+        }
 
         // Require file if it exists.
-        if (file_exists($file)) {
-            require_once $file;
+        foreach ($possiblePaths as $file) {
+            if (file_exists($file)) {
+                require_once $file;
+                return;
+            }
         }
     }
 }
