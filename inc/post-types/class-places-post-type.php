@@ -3,6 +3,8 @@
  * Places custom post type
  *
  * @package MyTheme
+ * @author Serhii Soloviov <seserg777@gmail.com>
+ * @version 1.0.0
  */
 
 namespace MyTheme\PostTypes;

@@ -3,6 +3,8 @@
  * Theme functions and definitions
  *
  * @package MyTheme
+ * @author Serhii Soloviov <seserg777@gmail.com>
+ * @version 1.0.0
  */
 
 // Exit if accessed directly.

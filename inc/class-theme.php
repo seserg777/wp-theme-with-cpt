@@ -3,6 +3,8 @@
  * Main theme class
  *
  * @package MyTheme
+ * @author Serhii Soloviov <seserg777@gmail.com>
+ * @version 1.0.0
  */
 
 namespace MyTheme;
@@ -98,10 +100,10 @@ class Theme
         );
         wp_enqueue_script('jquery');
 
-        // Enqueue theme main script.
+        // Enqueue theme main script (webpack build).
         wp_enqueue_script(
             'mytheme-main',
-            get_template_directory_uri() . '/assets/js/main.js',
+            get_template_directory_uri() . '/dist/js/main.min.js',
             ['jquery'],
             '1.0.0',
             true
@@ -113,7 +115,7 @@ class Theme
             is_tax('places_category')) {
             wp_enqueue_style(
                 'mytheme-places',
-                get_template_directory_uri() . '/assets/css/places.css',
+                get_template_directory_uri() . '/dist/css/places-styles.min.css',
                 [],
                 '1.0.0'
             );
@@ -122,14 +124,14 @@ class Theme
             if (is_post_type_archive('places') || is_tax('places_category')) {
                 wp_enqueue_style(
                     'mytheme-places-modal',
-                    get_template_directory_uri() . '/assets/css/places-modal.css',
+                    get_template_directory_uri() . '/dist/css/places-modal.min.css',
                     ['mytheme-places'],
                     '1.0.0'
                 );
 
                 wp_enqueue_script(
                     'mytheme-places',
-                    get_template_directory_uri() . '/assets/js/places.js',
+                    get_template_directory_uri() . '/dist/js/places.min.js',
                     ['jquery', 'mytheme-main'],
                     '1.0.0',
                     true
@@ -166,22 +168,33 @@ class Theme
      */
     public function enqueueAdminScripts(): void
     {
-        // Enqueue admin styles for custom post types.
+        // Enqueue admin styles for custom post types (webpack build).
         wp_enqueue_style(
             'mytheme-admin',
-            get_template_directory_uri() . '/assets/css/admin.css',
+            get_template_directory_uri() . '/dist/css/admin-styles.min.css',
             [],
             '1.0.0'
         );
 
-        // Enqueue admin script.
+        // Enqueue admin script (webpack build).
         wp_enqueue_script(
             'mytheme-admin',
-            get_template_directory_uri() . '/assets/js/admin.js',
+            get_template_directory_uri() . '/dist/js/admin.min.js',
             ['jquery'],
             '1.0.0',
             true
         );
+
+        // Enqueue places admin styles on places edit screens.
+        $screen = get_current_screen();
+        if ($screen && $screen->post_type === 'places') {
+            wp_enqueue_style(
+                'mytheme-places-admin',
+                get_template_directory_uri() . '/dist/css/places-admin.min.css',
+                ['mytheme-admin'],
+                '1.0.0'
+            );
+        }
     }
 
     /**

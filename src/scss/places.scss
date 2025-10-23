@@ -1,0 +1,520 @@
+/**
+ * Places post type frontend styles
+ *
+ * @package MyTheme
+ * @author Serhii Soloviov <seserg777@gmail.com>
+ * @version 1.0.0
+ */
+
+@import 'variables';
+@import 'mixins';
+
+/* Single place page */
+.places-single {
+    .entry-header {
+        margin-bottom: $spacing-xxl;
+    }
+
+    .places-thumbnail {
+        margin: $spacing-lg 0;
+
+        img {
+            width: 100%;
+            height: auto;
+            border-radius: $border-radius-lg;
+            @include box-shadow;
+        }
+    }
+}
+
+/* Places info section */
+.places-info {
+    @include grid(auto-fit, $spacing-lg);
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    margin: $spacing-xxl 0;
+    padding: $spacing-xl;
+    background: $color-bg-light;
+    border-radius: $border-radius-lg;
+    border-left: 4px solid $color-primary;
+}
+
+.places-info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-sm;
+
+    .places-icon {
+        flex-shrink: 0;
+        font-size: $spacing-lg;
+        width: 24px;
+        height: 24px;
+        color: $color-primary;
+    }
+}
+
+.places-info-content {
+    flex: 1;
+
+    strong {
+        display: block;
+        margin-bottom: $spacing-xs;
+        font-size: $font-size-md;
+        color: $color-text;
+    }
+
+    p {
+        margin: 0;
+        color: $color-text-light;
+    }
+
+    a {
+        color: $color-primary;
+        text-decoration: none;
+        @include transition(color);
+
+        &:hover {
+            color: $color-primary-dark;
+            text-decoration: underline;
+        }
+    }
+}
+
+/* Archive page */
+.places-archive,
+.places-category-archive {
+    .page-header {
+        margin-bottom: $spacing-xxxl;
+        padding-bottom: $spacing-lg;
+        border-bottom: 2px solid $color-border;
+    }
+}
+
+/* Table wrapper */
+.places-table-wrapper {
+    margin-bottom: $spacing-xxxl;
+    overflow-x: auto;
+    background: $color-bg;
+    border-radius: $border-radius-lg;
+    @include box-shadow;
+}
+
+/* Table styles */
+.places-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: $color-bg;
+
+    thead {
+        background: $color-bg-light;
+        border-bottom: 2px solid $color-border;
+    }
+
+    th {
+        padding: $spacing-md $spacing-lg;
+        text-align: left;
+        font-weight: $font-weight-semibold;
+        font-size: $font-size-md;
+        color: $color-text;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+}
+
+/* Sortable columns */
+.places-table th.sortable {
+    cursor: pointer;
+    @include user-select(none);
+    position: relative;
+    padding-right: $spacing-xxl;
+    @include transition(background-color);
+
+    &:hover {
+        background-color: #f0f0f0;
+    }
+
+    .sort-icon {
+        position: absolute;
+        right: $spacing-sm;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 12px;
+        height: 12px;
+
+        &::before {
+            content: '⇅';
+            color: $color-border-light;
+            font-size: $font-size-xl;
+        }
+    }
+
+    &.sorted .sort-icon::before {
+        color: $color-primary;
+    }
+
+    &.sorted-asc .sort-icon::before {
+        content: '▲';
+    }
+
+    &.sorted-desc .sort-icon::before {
+        content: '▼';
+    }
+}
+
+.places-table tbody {
+    tr {
+        border-bottom: 1px solid $color-border;
+        @include transition(background-color);
+
+        &:hover {
+            background-color: $color-bg-light;
+        }
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        &:nth-child(even) {
+            background-color: $color-bg-lighter;
+
+            &:hover {
+                background-color: #f0f0f0;
+            }
+        }
+    }
+
+    td {
+        padding: $spacing-md $spacing-lg;
+        font-size: $font-size-md;
+        color: $color-text-light;
+        vertical-align: middle;
+    }
+}
+
+/* Table columns */
+.places-col-name {
+    width: 25%;
+    font-weight: $font-weight-medium;
+}
+
+.places-col-street {
+    width: 25%;
+}
+
+.places-col-number {
+    width: 10%;
+}
+
+.places-col-region {
+    width: 15%;
+}
+
+.places-col-nip {
+    width: 15%;
+    font-family: $font-family-mono;
+}
+
+.places-col-actions {
+    width: 10%;
+    text-align: center;
+}
+
+/* Table links */
+.places-name-link {
+    color: $color-primary;
+    text-decoration: none;
+    font-weight: $font-weight-semibold;
+    @include transition(color);
+
+    &:hover {
+        color: $color-primary-dark;
+        text-decoration: underline;
+    }
+}
+
+/* Action buttons */
+.places-view-btn,
+.places-edit-btn {
+    @include button-base;
+    margin-right: $spacing-xs;
+
+    &:last-child {
+        margin-right: 0;
+    }
+}
+
+.places-view-btn {
+    background: $color-primary;
+
+    &:hover {
+        background: $color-primary-dark;
+    }
+}
+
+.places-edit-btn {
+    background: $color-secondary;
+
+    &:hover {
+        background: $color-secondary-dark;
+    }
+}
+
+/* Load more section */
+.places-load-more-container {
+    margin: $spacing-xxxl 0;
+    text-align: center;
+}
+
+.places-load-more-btn {
+    display: inline-block;
+    padding: 12px $spacing-xxxl;
+    background: $color-primary;
+    color: $color-bg;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    border: none;
+    border-radius: $border-radius-sm;
+    cursor: pointer;
+    @include transition(all, $transition-slow);
+    @include box-shadow($shadow-sm);
+
+    &:hover {
+        background: $color-primary-dark;
+        transform: translateY(-2px);
+        @include box-shadow($shadow-lg);
+    }
+
+    &:active {
+        transform: translateY(0);
+        @include box-shadow($shadow-sm);
+    }
+
+    &:disabled,
+    &.loading {
+        background: $color-border-light;
+        color: $color-text-lighter;
+        cursor: not-allowed;
+        transform: none;
+    }
+}
+
+.places-loader {
+    @include flex-center;
+    gap: $spacing-sm;
+    margin-top: $spacing-lg;
+    color: $color-text-lighter;
+
+    .spinner {
+        display: inline-block;
+        width: $spacing-lg;
+        height: $spacing-lg;
+        border: 3px solid #f3f4f5;
+        border-top-color: $color-primary;
+        border-radius: 50%;
+        @include animation(spin, 0.8s, linear);
+        animation-iteration-count: infinite;
+    }
+
+    .loader-text {
+        font-size: $font-size-md;
+        font-weight: $font-weight-medium;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.places-no-more {
+    margin: 0;
+    padding: $spacing-md;
+    color: $color-text-lighter;
+    font-size: $font-size-lg;
+    font-style: italic;
+}
+
+.places-message {
+    margin-top: $spacing-md;
+    padding: 12px $spacing-lg;
+    background: $color-bg;
+    border-left: 4px solid $color-primary;
+    border-radius: $border-radius-sm;
+    color: $color-text;
+    font-size: $font-size-md;
+    @include box-shadow($shadow-sm);
+}
+
+.places-load-more-container.all-loaded {
+    .places-load-more-btn {
+        display: none;
+    }
+}
+
+/* Animation for new rows */
+.places-table-row {
+    @include animation(fadeIn);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Loading row */
+.places-table .loading-row {
+    text-align: center;
+    padding: $spacing-xxl;
+    font-style: italic;
+    color: $color-text-lighter;
+}
+
+/* Responsive design */
+@include respond-to(md) {
+    .places-table {
+        th,
+        td {
+            padding: 12px $spacing-md;
+            font-size: $font-size-base;
+        }
+    }
+
+    .places-col-name {
+        width: 30%;
+    }
+
+    .places-col-street {
+        width: 30%;
+    }
+}
+
+@include respond-to(sm) {
+    .places-info {
+        grid-template-columns: 1fr;
+        gap: $spacing-md;
+        padding: $spacing-lg;
+    }
+
+    .places-table-wrapper {
+        border-radius: 0;
+        margin-left: -20px;
+        margin-right: -20px;
+    }
+
+    .places-table {
+        font-size: $font-size-sm;
+
+        th,
+        td {
+            padding: $spacing-sm 8px;
+        }
+
+        th {
+            font-size: $font-size-xs;
+        }
+    }
+
+    .places-col-nip,
+    .places-col-number {
+        display: none;
+    }
+
+    .places-col-name,
+    .places-col-street,
+    .places-col-region {
+        width: auto;
+    }
+
+    .places-load-more-btn {
+        padding: $spacing-sm $spacing-xxl;
+        font-size: $font-size-lg;
+    }
+
+    .places-view-btn,
+    .places-edit-btn {
+        padding: $spacing-xs 12px;
+        font-size: $font-size-sm;
+    }
+}
+
+@include respond-to(xs) {
+    .places-info {
+        padding: $spacing-md;
+    }
+
+    .places-table {
+        th,
+        td {
+            padding: 8px 6px;
+        }
+    }
+
+    .places-load-more-btn {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    // Stack table vertically on very small screens
+    .places-table {
+        thead {
+            display: none;
+        }
+
+        &,
+        tbody,
+        tr,
+        td {
+            display: block;
+            width: 100%;
+        }
+
+        tr {
+            margin-bottom: $spacing-md;
+            border: 1px solid $color-border;
+            border-radius: $border-radius-sm;
+            padding: $spacing-sm;
+        }
+
+        td {
+            text-align: left;
+            padding: 8px 0;
+            border: none;
+
+            &::before {
+                content: attr(data-label);
+                font-weight: $font-weight-semibold;
+                display: inline-block;
+                width: 100px;
+                color: $color-text;
+            }
+        }
+
+        .places-col-name::before {
+            content: 'Name: ';
+        }
+
+        .places-col-street::before {
+            content: 'Street: ';
+        }
+
+        .places-col-region::before {
+            content: 'Region: ';
+        }
+
+        .places-col-actions {
+            text-align: left;
+            padding-top: $spacing-sm;
+            border-top: 1px solid $color-border;
+            margin-top: $spacing-xs;
+
+            &::before {
+                display: none;
+            }
+        }
+    }
+}
+

@@ -1,0 +1,130 @@
+/**
+ * Places post type admin styles
+ *
+ * @package MyTheme
+ * @author Serhii Soloviov <seserg777@gmail.com>
+ * @version 1.0.0
+ */
+
+@import 'variables';
+@import 'mixins';
+
+/* Meta box fields container */
+.places-meta-fields {
+    padding: 10px 0;
+}
+
+/* Field groups */
+.places-field-group {
+    margin-bottom: $spacing-xl;
+    padding: $spacing-md;
+    background: $color-bg-light;
+    border: 1px solid $color-border;
+    border-radius: $border-radius-sm;
+
+    h4 {
+        margin: 0 0 $spacing-md 0;
+        padding-bottom: $spacing-sm;
+        border-bottom: 1px solid $color-border-light;
+        font-size: $font-size-md;
+        font-weight: $font-weight-semibold;
+        color: $color-text;
+    }
+}
+
+/* Field rows */
+.places-field-row {
+    display: flex;
+    gap: $spacing-md;
+    margin-bottom: $spacing-md;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+/* Individual fields */
+.places-field {
+    display: flex;
+    flex-direction: column;
+
+    &-wide {
+        flex: 3;
+    }
+
+    &-narrow {
+        flex: 1;
+        min-width: 120px;
+    }
+
+    &-half {
+        flex: 1;
+    }
+
+    label {
+        display: block;
+        margin-bottom: $spacing-xs;
+        font-weight: $font-weight-semibold;
+        color: $color-text;
+        font-size: $font-size-base;
+
+        .required {
+            color: $color-required;
+            font-weight: $font-weight-bold;
+        }
+    }
+
+    input[type="text"] {
+        padding: 8px 12px;
+        font-size: $font-size-md;
+        line-height: $line-height-base;
+        border: 1px solid $color-border-light;
+        border-radius: $border-radius-sm;
+        box-shadow: 0 0 0 transparent;
+        @include transition(border-color);
+
+        &:focus {
+            border-color: $color-primary;
+            box-shadow: 0 0 0 1px $color-primary;
+            outline: 2px solid transparent;
+        }
+    }
+
+    .description {
+        margin-top: $spacing-xs;
+        font-size: $font-size-sm;
+        color: $color-text-lighter;
+        font-style: italic;
+    }
+}
+
+/* Required field notice */
+.places-meta-fields > .description {
+    margin-top: $spacing-sm;
+    padding: $spacing-sm;
+    background: $color-bg;
+    border-left: 3px solid $color-required;
+    font-size: $font-size-base;
+    color: $color-text-lighter;
+
+    .required {
+        color: $color-required;
+        font-weight: $font-weight-bold;
+    }
+}
+
+/* Responsive adjustments */
+@include respond-to(sm) {
+    .places-field-row {
+        flex-direction: column;
+        gap: $spacing-sm;
+    }
+
+    .places-field-wide,
+    .places-field-narrow,
+    .places-field-half {
+        width: 100%;
+        min-width: auto;
+    }
+}
+

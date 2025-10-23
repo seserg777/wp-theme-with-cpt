@@ -40,7 +40,7 @@
          */
         initMetaBoxes: function () {
             // Add custom functionality for meta boxes here
-            $('.portfolio-meta-fields input').on('change', function () {
+            $('.places-meta-fields input').on('change', function () {
                 // Handle input changes if needed
             });
         }

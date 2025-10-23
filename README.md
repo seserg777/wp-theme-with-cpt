@@ -2,6 +2,10 @@
 
 A modern, object-oriented WordPress theme built following WordPress Coding Standards and PSR-12.
 
+**Author:** Serhii Soloviov  
+**Email:** seserg777@gmail.com  
+**Version:** 1.0.0
+
 ## Features
 
 - ✅ Object-Oriented PHP (PSR-12 compliant)
@@ -12,6 +16,11 @@ A modern, object-oriented WordPress theme built following WordPress Coding Stand
 - ✅ Meta boxes for custom fields
 - ✅ WordPress Coding Standards compliant
 - ✅ Gutenberg/Block Editor support
+- ✅ Webpack 5 build system
+- ✅ SCSS with variables and mixins
+- ✅ ES6+ JavaScript with Babel
+- ✅ Autoprefixer for cross-browser compatibility
+- ✅ Minification and optimization
 
 ## Structure
 
@@ -72,9 +81,52 @@ class YourPostType extends PostTypeBase
 }
 ```
 
+## Build System
+
+The theme uses Webpack 5 for modern asset compilation:
+
+### Development
+
+```bash
+# Install dependencies
+npm install
+
+# Watch mode (development)
+npm run dev
+
+# Production build
+npm run build
+
+# Development build (with source maps)
+npm run build:dev
+```
+
+### Asset Structure
+
+```
+src/
+├── js/          # Source JavaScript files
+├── scss/        # Source SCSS files
+│   ├── _variables.scss
+│   ├── _mixins.scss
+│   └── *.scss
+
+dist/           # Compiled assets (auto-generated)
+├── js/         # Minified JavaScript
+└── css/        # Minified CSS with autoprefixer
+```
+
+### Features
+
+- **SCSS**: Variables, mixins, nesting
+- **Babel**: ES6+ transpilation for older browsers
+- **Autoprefixer**: Automatic vendor prefixes
+- **Minification**: CSS and JS optimization
+- **Source Maps**: Available in development mode
+
 ## jQuery Usage
 
-The theme includes jQuery 3.7.1. All theme scripts are located in `assets/js/main.js`.
+The theme includes jQuery 3.7.1. All theme scripts are located in `src/js/`.
 
 Example:
 
@@ -84,16 +136,27 @@ MyTheme.ajaxRequest('your_action', { key: 'value' }, function(response) {
 });
 ```
 
+## Browser Support
+
+- \> 1% market share
+- Last 2 versions
+- Not dead browsers
+- Excludes IE 11
+
 ## Requirements
 
 - WordPress 5.0+
 - PHP 7.4+
+- Node.js 14+ (for development)
+- npm or yarn (for development)
 
 ## Installation
 
 1. Upload the theme to `wp-content/themes/mytheme/`
-2. Activate the theme in WordPress admin
-3. Configure theme settings as needed
+2. Run `npm install` (for development)
+3. Run `npm run build` to compile assets
+4. Activate the theme in WordPress admin
+5. Configure theme settings as needed
 
 ## Development
 
@@ -101,8 +164,14 @@ The theme follows:
 - [WordPress Coding Standards](https://developer.wordpress.org/coding-standards/)
 - [PSR-12: Extended Coding Style](https://www.php-fig.org/psr/psr-12/)
 - Modern JavaScript (ES6+)
+- SCSS best practices
+- BEM methodology for CSS classes
 
 ## License
 
 GNU General Public License v2 or later
+
+## Credits
+
+Developed by **Serhii Soloviov** (seserg777@gmail.com)
 

@@ -1,0 +1,136 @@
+/**
+ * Mixins
+ *
+ * @package MyTheme
+ * @author Serhii Soloviov <seserg777@gmail.com>
+ * @version 1.0.0
+ */
+
+// Responsive breakpoints
+@mixin respond-to($breakpoint) {
+    @if $breakpoint == xs {
+        @media screen and (max-width: $breakpoint-xs) {
+            @content;
+        }
+    } @else if $breakpoint == sm {
+        @media screen and (max-width: $breakpoint-sm) {
+            @content;
+        }
+    } @else if $breakpoint == md {
+        @media screen and (max-width: $breakpoint-md) {
+            @content;
+        }
+    } @else if $breakpoint == lg {
+        @media screen and (max-width: $breakpoint-lg) {
+            @content;
+        }
+    }
+}
+
+// Flexbox centering
+@mixin flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+// Flex between
+@mixin flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+// Button reset
+@mixin button-reset {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+// Button base
+@mixin button-base {
+    display: inline-block;
+    padding: 6px 16px;
+    color: $color-bg;
+    text-decoration: none;
+    border-radius: $border-radius-sm;
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
+    transition: background $transition-base;
+    border: none;
+    cursor: pointer;
+}
+
+// Truncate text
+@mixin truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+// Clearfix
+@mixin clearfix {
+    &::after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+}
+
+// Box shadow
+@mixin box-shadow($shadow: $shadow-md) {
+    box-shadow: $shadow;
+}
+
+// Animation
+@mixin animation($name, $duration: 0.3s, $timing: ease-out) {
+    animation: $name $duration $timing;
+}
+
+// Transition
+@mixin transition($property: all, $duration: $transition-base) {
+    transition: $property $duration;
+}
+
+// Placeholder
+@mixin placeholder {
+    &::-webkit-input-placeholder {
+        @content;
+    }
+    &:-moz-placeholder {
+        @content;
+    }
+    &::-moz-placeholder {
+        @content;
+    }
+    &:-ms-input-placeholder {
+        @content;
+    }
+}
+
+// User select
+@mixin user-select($value: none) {
+    -webkit-user-select: $value;
+    -moz-user-select: $value;
+    -ms-user-select: $value;
+    user-select: $value;
+}
+
+// Position absolute center
+@mixin absolute-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+// Grid
+@mixin grid($columns: 2, $gap: $spacing-lg) {
+    display: grid;
+    grid-template-columns: repeat($columns, 1fr);
+    gap: $gap;
+}
+

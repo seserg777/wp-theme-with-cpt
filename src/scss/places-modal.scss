@@ -1,0 +1,230 @@
+/**
+ * Places edit modal styles
+ *
+ * @package MyTheme
+ * @author Serhii Soloviov <seserg777@gmail.com>
+ * @version 1.0.0
+ */
+
+@import 'variables';
+@import 'mixins';
+
+/* Modal overlay */
+.places-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    @include flex-center;
+    z-index: $z-index-modal;
+}
+
+/* Modal container */
+.places-modal {
+    background: $color-bg;
+    border-radius: $border-radius-lg;
+    @include box-shadow($shadow-xl);
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Modal header */
+.places-modal-header {
+    @include flex-between;
+    padding: $spacing-lg $spacing-xl;
+    border-bottom: 1px solid $color-border;
+    background: $color-bg-light;
+
+    h2 {
+        margin: 0;
+        font-size: $spacing-lg;
+        font-weight: $font-weight-semibold;
+        color: $color-text;
+    }
+}
+
+.places-modal-close {
+    @include button-reset;
+    font-size: 32px;
+    line-height: 1;
+    color: $color-text-lighter;
+    width: 32px;
+    height: 32px;
+    @include flex-center;
+    @include transition(color);
+
+    &:hover {
+        color: $color-text;
+    }
+}
+
+/* Modal body */
+.places-modal-body {
+    padding: $spacing-xl;
+    overflow-y: auto;
+}
+
+/* Form styles */
+.places-edit-form {
+    .form-field {
+        margin-bottom: $spacing-lg;
+    }
+
+    .form-row {
+        @include grid(2, $spacing-md);
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: $font-weight-semibold;
+        font-size: $font-size-md;
+        color: $color-text;
+
+        .required {
+            color: $color-required;
+            font-weight: $font-weight-bold;
+        }
+    }
+
+    input[type="text"] {
+        width: 100%;
+        padding: $spacing-sm 14px;
+        font-size: $font-size-md;
+        line-height: $line-height-base;
+        border: 1px solid $color-border-light;
+        border-radius: $border-radius-sm;
+        box-shadow: 0 0 0 transparent;
+        @include transition(border-color, $transition-fast);
+
+        &:focus {
+            border-color: $color-primary;
+            box-shadow: 0 0 0 1px $color-primary;
+            outline: none;
+        }
+    }
+}
+
+/* Form actions */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-sm;
+    margin-top: $spacing-xl;
+    padding-top: $spacing-lg;
+    border-top: 1px solid $color-border;
+
+    button {
+        padding: $spacing-sm 24px;
+        font-size: $font-size-md;
+        font-weight: $font-weight-semibold;
+        border: none;
+        border-radius: $border-radius-sm;
+        cursor: pointer;
+        @include transition(all);
+    }
+}
+
+.btn-cancel {
+    background: #f0f0f0;
+    color: $color-text-lighter;
+
+    &:hover {
+        background: $color-border-light;
+        color: $color-text;
+    }
+}
+
+.btn-save {
+    background: $color-primary;
+    color: $color-bg;
+
+    &:hover {
+        background: $color-primary-dark;
+    }
+
+    &:disabled {
+        background: $color-border-light;
+        color: $color-text-lighter;
+        cursor: not-allowed;
+    }
+}
+
+/* Body with modal open */
+body.modal-open {
+    overflow: hidden;
+}
+
+/* Messages */
+.places-edit-message {
+    margin-bottom: $spacing-lg;
+    padding: 12px $spacing-lg;
+    border-radius: $border-radius-sm;
+    font-size: $font-size-md;
+    font-weight: $font-weight-medium;
+    @include animation(slideDown);
+
+    &.success {
+        background: $color-success-bg;
+        color: $color-success-text;
+        border-left: 4px solid $color-success;
+    }
+
+    &.error {
+        background: $color-error-bg;
+        color: $color-error-text;
+        border-left: 4px solid $color-error;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@include respond-to(sm) {
+    .places-modal {
+        width: 95%;
+        max-height: 95vh;
+    }
+
+    .places-modal-header {
+        padding: $spacing-md $spacing-lg;
+
+        h2 {
+            font-size: $font-size-xxl;
+        }
+    }
+
+    .places-modal-body {
+        padding: $spacing-lg;
+    }
+}
+
+@include respond-to(xs) {
+    .places-edit-form .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+
+        button {
+            width: 100%;
+        }
+    }
+}
+

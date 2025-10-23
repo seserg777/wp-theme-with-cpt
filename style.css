@@ -1,14 +1,14 @@
 /*
 Theme Name: MyTheme
-Theme URI: https://example.com/mytheme
-Author: Your Name
-Author URI: https://example.com
-Description: A custom WordPress theme
+Theme URI: https://github.com/seserg777/wp-theme-with-cpt
+Author: Serhii Soloviov
+Author URI: https://github.com/seserg777
+Description: A modern, object-oriented WordPress theme with custom post types, Webpack 5, SCSS, and ES6+
 Version: 1.0.0
 License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: mytheme
-Tags: custom, blank
+Tags: custom, modern, webpack, scss, oop, psr-12
 */
 
 /* Theme Styles */

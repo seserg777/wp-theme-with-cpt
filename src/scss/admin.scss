@@ -1,0 +1,45 @@
+/**
+ * Admin styles
+ *
+ * @package MyTheme
+ * @author Serhii Soloviov <seserg777@gmail.com>
+ * @version 1.0.0
+ */
+
+@import 'variables';
+@import 'mixins';
+
+/* Meta box styles */
+.portfolio-meta-fields {
+    padding: 10px 0;
+
+    p {
+        margin-bottom: $spacing-md;
+    }
+
+    label {
+        display: block;
+        margin-bottom: $spacing-xs;
+        font-weight: $font-weight-semibold;
+        color: $color-text;
+    }
+
+    input[type="text"],
+    input[type="url"],
+    input[type="date"] {
+        padding: 8px 12px;
+        font-size: $font-size-md;
+        line-height: $line-height-base;
+        border: 1px solid $color-border-light;
+        border-radius: $border-radius-sm;
+        box-shadow: 0 0 0 transparent;
+        @include transition(border-color);
+
+        &:focus {
+            border-color: $color-primary;
+            box-shadow: 0 0 0 1px $color-primary;
+            outline: 2px solid transparent;
+        }
+    }
+}
+

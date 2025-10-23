@@ -3,6 +3,8 @@
  * Base class for custom post types
  *
  * @package MyTheme
+ * @author Serhii Soloviov <seserg777@gmail.com>
+ * @version 1.0.0
  */
 
 namespace MyTheme\PostTypes;
