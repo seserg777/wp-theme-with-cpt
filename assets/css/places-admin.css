@@ -1,0 +1,125 @@
+/**
+ * Places post type admin styles
+ *
+ * @package MyTheme
+ */
+
+/* Meta box fields container */
+.places-meta-fields {
+    padding: 10px 0;
+}
+
+/* Field groups */
+.places-field-group {
+    margin-bottom: 25px;
+    padding: 15px;
+    background: #f9f9f9;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+}
+
+.places-field-group h4 {
+    margin: 0 0 15px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #dcdcde;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+/* Field rows */
+.places-field-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.places-field-row:last-child {
+    margin-bottom: 0;
+}
+
+/* Individual fields */
+.places-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.places-field-wide {
+    flex: 3;
+}
+
+.places-field-narrow {
+    flex: 1;
+    min-width: 120px;
+}
+
+.places-field-half {
+    flex: 1;
+}
+
+.places-field label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #1d2327;
+    font-size: 13px;
+}
+
+.places-field label .required {
+    color: #d63638;
+    font-weight: bold;
+}
+
+.places-field input[type="text"] {
+    padding: 8px 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    box-shadow: 0 0 0 transparent;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.places-field input:focus {
+    border-color: #2271b1;
+    box-shadow: 0 0 0 1px #2271b1;
+    outline: 2px solid transparent;
+}
+
+.places-field .description {
+    margin-top: 5px;
+    font-size: 12px;
+    color: #646970;
+    font-style: italic;
+}
+
+/* Required field notice */
+.places-meta-fields > .description {
+    margin-top: 10px;
+    padding: 10px;
+    background: #fff;
+    border-left: 3px solid #d63638;
+    font-size: 13px;
+    color: #646970;
+}
+
+.places-meta-fields > .description .required {
+    color: #d63638;
+    font-weight: bold;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 782px) {
+    .places-field-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .places-field-wide,
+    .places-field-narrow,
+    .places-field-half {
+        width: 100%;
+        min-width: auto;
+    }
+}
+
