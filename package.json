@@ -5,16 +5,22 @@
   "author": "Serhii Soloviov <seserg777@gmail.com>",
   "license": "GPL-2.0-or-later",
   "scripts": {
-    "dev": "webpack --mode development --watch",
+    "dev": "cross-env BROWSER_SYNC=true webpack --mode development --watch",
+    "watch": "cross-env BROWSER_SYNC=true webpack --mode development --watch",
+    "watch:prod": "cross-env BROWSER_SYNC=true webpack --mode production --watch",
     "build": "webpack --mode production",
-    "build:dev": "webpack --mode development"
+    "build:dev": "webpack --mode development",
+    "watch:no-sync": "webpack --mode development --watch"
   },
   "devDependencies": {
     "@babel/core": "^7.23.0",
     "@babel/preset-env": "^7.23.0",
     "autoprefixer": "^10.4.16",
     "babel-loader": "^9.1.3",
+    "browser-sync": "^3.0.2",
+    "browser-sync-webpack-plugin": "^2.3.0",
     "clean-webpack-plugin": "^4.0.0",
+    "cross-env": "^7.0.3",
     "core-js": "^3.33.0",
     "css-loader": "^6.8.1",
     "css-minimizer-webpack-plugin": "^5.0.1",

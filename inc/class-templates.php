@@ -68,11 +68,6 @@ class Templates
             return $this->getTemplate('archive-places.php');
         }
 
-        // Handle places category taxonomy template.
-        if (is_tax('places_category')) {
-            return $this->getTemplate('taxonomy-places_category.php');
-        }
-
         return $template;
     }
 
@@ -94,14 +89,4 @@ class Templates
         return get_query_template('index');
     }
 
-    /**
-     * Get templates directory path
-     *
-     * @return string
-     */
-    public function getTemplatesDir(): string
-    {
-        return $this->templatesDir;
-    }
 }
-

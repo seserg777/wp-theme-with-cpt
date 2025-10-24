@@ -88,27 +88,6 @@ function mytheme_load_textdomain()
 add_action('init', 'mytheme_load_textdomain');
 
 /**
- * Add Places archive link to menu
- */
-function mytheme_add_places_to_menu($items, $args)
-{
-    // Only add to primary menu
-    if ($args->theme_location === 'primary') {
-        $places_link = '<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-places">
-            <a href="' . esc_url(get_post_type_archive_link('places')) . '" class="nav-link">
-                📍 ' . __('Places', 'mytheme') . '
-            </a>
-        </li>';
-        
-        // Add after the last item
-        $items .= $places_link;
-    }
-    
-    return $items;
-}
-add_filter('wp_nav_menu_items', 'mytheme_add_places_to_menu', 10, 2);
-
-/**
  * Add rewrite rules for edit place page
  */
 function mytheme_add_edit_place_rewrite_rules()

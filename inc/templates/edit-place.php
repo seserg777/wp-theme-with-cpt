@@ -62,7 +62,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $post_data = [
         'ID' => $place_id,
         'post_title' => sanitize_text_field($_POST['title']),
-        'post_content' => sanitize_textarea_field($_POST['content']),
     ];
     wp_update_post($post_data);
     
@@ -71,8 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $nip = preg_replace('/[^0-9]/', '', $nip);
     
     // Update meta fields
-    update_post_meta($place_id, '_places_street', sanitize_text_field($_POST['street']));
-    update_post_meta($place_id, '_places_number', sanitize_text_field($_POST['number']));
+    update_post_meta($place_id, '_places_address', sanitize_text_field($_POST['address']));
     update_post_meta($place_id, '_places_region', sanitize_text_field($_POST['region']));
     update_post_meta($place_id, '_places_nip', $nip);
     
@@ -117,33 +115,16 @@ get_header();
                                    required />
                         </div>
                         
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="edit-street" class="form-label">
-                                        <?php esc_html_e('Street', 'mytheme'); ?> <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="text" 
-                                           class="form-control" 
-                                           id="edit-street" 
-                                           name="street" 
-                                           value="<?php echo esc_attr(get_post_meta($place_id, '_places_street', true)); ?>" 
-                                           required />
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="edit-number" class="form-label">
-                                        <?php esc_html_e('Number', 'mytheme'); ?> <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="text" 
-                                           class="form-control" 
-                                           id="edit-number" 
-                                           name="number" 
-                                           value="<?php echo esc_attr(get_post_meta($place_id, '_places_number', true)); ?>" 
-                                           required />
-                                </div>
-                            </div>
+                        <div class="mb-3">
+                            <label for="edit-address" class="form-label">
+                                <?php esc_html_e('Address', 'mytheme'); ?> <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="edit-address" 
+                                   name="address" 
+                                   value="<?php echo esc_attr(get_post_meta($place_id, '_places_address', true)); ?>"
+                                   required />
                         </div>
                         
                         <div class="row">
@@ -172,16 +153,6 @@ get_header();
                                            value="<?php echo esc_attr(get_post_meta($place_id, '_places_nip', true)); ?>" />
                                 </div>
                             </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="edit-content" class="form-label">
-                                <?php esc_html_e('Description', 'mytheme'); ?>
-                            </label>
-                            <textarea class="form-control" 
-                                      id="edit-content" 
-                                      name="content" 
-                                      rows="4"><?php echo esc_textarea($place->post_content); ?></textarea>
                         </div>
                         
                         <div class="d-flex justify-content-between">
@@ -217,8 +188,6 @@ jQuery(document).ready(function($) {
         $btnText.text('<?php esc_js_e('Saving...', 'mytheme'); ?>');
         $btnLoading.removeClass('d-none');
         $submitBtn.prop('disabled', true);
-        
-        // Form will submit normally (POST request)
     });
 });
 </script>

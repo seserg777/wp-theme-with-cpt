@@ -11,19 +11,14 @@
 
 /* Single place page */
 .places-single {
+    margin-bottom: 40px;
+
     .entry-header {
         margin-bottom: $spacing-xxl;
     }
 
     .places-details-wrapper {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: $spacing-xxl;
         margin-bottom: $spacing-xxl;
-
-        @media (min-width: 768px) {
-            grid-template-columns: 300px 1fr;
-        }
     }
 
     .places-thumbnail {
@@ -109,7 +104,6 @@
         display: flex;
         gap: $spacing-md;
         padding-top: $spacing-lg;
-        border-top: 2px solid $color-border;
 
         .btn {
             display: inline-flex;
@@ -124,6 +118,7 @@
 
             .dashicons {
                 font-size: $font-size-lg;
+                line-height: 20px;
             }
 
             &.btn-secondary {
@@ -320,12 +315,8 @@
     font-weight: $font-weight-medium;
 }
 
-.places-col-street {
-    width: 25%;
-}
-
-.places-col-number {
-    width: 10%;
+.places-col-address {
+    width: 35%;
 }
 
 .places-col-region {
@@ -338,7 +329,8 @@
 }
 
 .places-col-actions {
-    width: 10%;
+    width: 180px;
+    min-width: 180px;
     text-align: center;
 }
 
@@ -415,6 +407,24 @@
 
     &:hover {
         background: $color-secondary-dark;
+    }
+
+    &.disabled {
+        background: $color-border;
+        color: $color-text-light;
+        cursor: not-allowed;
+        opacity: 0.6;
+        pointer-events: auto;
+
+        &:hover {
+            background: $color-border;
+            transform: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        &:active {
+            transform: none;
+        }
     }
 }
 
@@ -547,8 +557,8 @@
         width: 30%;
     }
 
-    .places-col-street {
-        width: 30%;
+    .places-col-address {
+        width: 40%;
     }
 }
 
@@ -608,13 +618,12 @@
         }
     }
 
-    .places-col-nip,
-    .places-col-number {
+    .places-col-nip {
         display: none;
     }
 
     .places-col-name,
-    .places-col-street,
+    .places-col-address,
     .places-col-region {
         width: auto;
     }
@@ -696,8 +705,8 @@
             content: 'Name: ';
         }
 
-        .places-col-street::before {
-            content: 'Street: ';
+        .places-col-address::before {
+            content: 'Address: ';
         }
 
         .places-col-region::before {
@@ -729,6 +738,111 @@
             font-size: 18px;
             width: 18px;
             height: 18px;
+        }
+    }
+}
+
+/* Authentication Modal */
+.places-auth-modal {
+    align-items: center;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    left: 0;
+    opacity: 0;
+    position: fixed;
+    top: 0;
+    transition: opacity 0.3s ease;
+    width: 100%;
+    z-index: 999999;
+
+    &.active {
+        opacity: 1;
+
+        .places-auth-modal-content {
+            transform: scale(1);
+        }
+    }
+}
+
+.places-auth-modal-content {
+    background: $color-bg;
+    border-radius: $border-radius-lg;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    max-width: 450px;
+    padding: $spacing-xxxl;
+    text-align: center;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+    width: 90%;
+}
+
+.places-auth-modal-icon {
+    background: $color-primary;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 60px;
+    width: 60px;
+    margin-bottom: $spacing-lg;
+
+    .dashicons {
+        color: $color-bg;
+        font-size: 30px;
+        width: 30px;
+        height: 30px;
+    }
+}
+
+.places-auth-modal-title {
+    color: $color-text;
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 $spacing-md;
+}
+
+.places-auth-modal-message {
+    color: $color-text-light;
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0 0 $spacing-xl;
+}
+
+.places-auth-modal-actions {
+    display: flex;
+    gap: $spacing-md;
+    justify-content: center;
+}
+
+.places-auth-modal-btn {
+    border: none;
+    border-radius: $border-radius-md;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 12px 30px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+
+    &.places-auth-btn-login {
+        background: $color-primary;
+        color: $color-bg;
+
+        &:hover {
+            background: $color-primary-dark;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-1px);
+        }
+    }
+
+    &.places-auth-btn-cancel {
+        background: $color-border;
+        color: $color-text;
+
+        &:hover {
+            background: darken($color-border, 5%);
         }
     }
 }

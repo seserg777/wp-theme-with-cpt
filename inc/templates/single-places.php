@@ -15,8 +15,7 @@ get_header(); ?>
         while (have_posts()) :
             the_post();
 
-            $placeDetails = PlacesPostType::getPlaceDetails(get_the_ID());
-            $fullAddress = PlacesPostType::getFullAddress(get_the_ID());
+            $place_details = PlacesPostType::getPlaceDetails(get_the_ID());
             ?>
 
             <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
@@ -37,65 +36,28 @@ get_header(); ?>
                                 <tr>
                                     <th scope="row">
                                         <span class="dashicons dashicons-location"></span>
-                                        <?php esc_html_e('Street', 'mytheme'); ?>
+                                        <?php esc_html_e('Address', 'mytheme'); ?>
                                     </th>
-                                    <td><?php echo !empty($placeDetails['street']) ? esc_html($placeDetails['street']) : '—'; ?></td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">
-                                        <span class="dashicons dashicons-location-alt"></span>
-                                        <?php esc_html_e('Number', 'mytheme'); ?>
-                                    </th>
-                                    <td><?php echo !empty($placeDetails['number']) ? esc_html($placeDetails['number']) : '—'; ?></td>
+                                    <td><?php echo ! empty($place_details['address']) ? esc_html($place_details['address']) : '—'; ?></td>
                                 </tr>
                                 <tr>
                                     <th scope="row">
                                         <span class="dashicons dashicons-admin-site"></span>
                                         <?php esc_html_e('Region', 'mytheme'); ?>
                                     </th>
-                                    <td><?php echo !empty($placeDetails['region']) ? esc_html($placeDetails['region']) : '—'; ?></td>
+                                    <td><?php echo ! empty($place_details['region']) ? esc_html($place_details['region']) : '—'; ?></td>
                                 </tr>
                                 <tr>
                                     <th scope="row">
                                         <span class="dashicons dashicons-id"></span>
                                         <?php esc_html_e('NIP (Tax ID)', 'mytheme'); ?>
                                     </th>
-                                    <td><?php echo !empty($placeDetails['nip']) ? esc_html($placeDetails['nip']) : '—'; ?></td>
+                                    <td><?php echo ! empty($place_details['nip']) ? esc_html($place_details['nip']) : '—'; ?></td>
                                 </tr>
-                                <?php
-                                $categories = get_the_terms(get_the_ID(), 'places_category');
-                                if ($categories && !is_wp_error($categories)) :
-                                    ?>
-                                    <tr>
-                                        <th scope="row">
-                                            <span class="dashicons dashicons-category"></span>
-                                            <?php esc_html_e('Categories', 'mytheme'); ?>
-                                        </th>
-                                        <td>
-                                            <?php
-                                            $categoryLinks = array_map(function ($cat) {
-                                                return sprintf(
-                                                    '<a href="%s">%s</a>',
-                                                    esc_url(get_term_link($cat)),
-                                                    esc_html($cat->name)
-                                                );
-                                            }, $categories);
-                                            echo implode(', ', $categoryLinks);
-                                            ?>
-                                        </td>
-                                    </tr>
-                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
                 </div>
-
-                <?php if (get_the_content()) : ?>
-                    <div class="entry-content">
-                        <h2><?php esc_html_e('Description', 'mytheme'); ?></h2>
-                        <?php the_content(); ?>
-                    </div>
-                <?php endif; ?>
                 
                 <div class="places-actions">
                     <a href="<?php echo esc_url(get_post_type_archive_link('places')); ?>" class="btn btn-secondary">
@@ -105,7 +67,7 @@ get_header(); ?>
                     <?php if (current_user_can('edit_post', get_the_ID())) : ?>
                         <?php 
                         $post_slug = get_post_field('post_name', get_the_ID());
-                        $edit_url = home_url('/places/' . $post_slug . '/edit/');
+                        $edit_url  = home_url('/places/' . $post_slug . '/edit/');
                         ?>
                         <a href="<?php echo esc_url($edit_url); ?>" class="btn btn-primary">
                             <span class="dashicons dashicons-edit"></span>
@@ -120,4 +82,3 @@ get_header(); ?>
 </main>
 
 <?php get_footer(); ?>
-

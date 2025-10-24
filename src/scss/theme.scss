@@ -1,0 +1,356 @@
+/**
+ * Theme Frontend Styles
+ *
+ * @package MyTheme
+ * @author Serhii Soloviov <seserg777@gmail.com>
+ * @version 1.0.0
+ */
+
+@import 'variables';
+@import 'mixins';
+
+/* ==========================================================================
+   Base Styles
+   ========================================================================== */
+
+body {
+    font-family: $font-family-base;
+    font-size: $font-size-base;
+    line-height: $line-height-base;
+    color: $color-text;
+    background: $color-bg-light;
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 $spacing-lg;
+}
+
+/* ==========================================================================
+   Typography
+   ========================================================================== */
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: $font-family-heading;
+    font-weight: 600;
+    line-height: 1.2;
+    color: $color-text;
+    margin: 0 0 $spacing-lg;
+}
+
+h1 {
+    font-size: 2.5rem;
+}
+
+h2 {
+    font-size: 2rem;
+}
+
+h3 {
+    font-size: 1.75rem;
+}
+
+h4 {
+    font-size: 1.5rem;
+}
+
+h5 {
+    font-size: 1.25rem;
+}
+
+h6 {
+    font-size: 1rem;
+}
+
+p {
+    margin: 0 0 $spacing-md;
+}
+
+a {
+    color: $color-primary;
+    text-decoration: none;
+    @include transition(color);
+
+    &:hover {
+        color: $color-primary-dark;
+        text-decoration: underline;
+    }
+}
+
+/* ==========================================================================
+   Layout
+   ========================================================================== */
+.site-header {
+    .main-navigation {
+        .navbar-nav {
+            li {
+                a {
+                    color: white;
+                    text-decoration: none;
+
+                    &:hover {
+                        text-decoration: underline;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.site-main {
+    padding: $spacing-xxxl 0;
+    min-height: 60vh;
+}
+
+.page-header {
+    margin-bottom: $spacing-xxxl;
+    padding-bottom: $spacing-lg;
+    border-bottom: 2px solid $color-border;
+
+    .page-title {
+        margin: 0 0 $spacing-sm;
+        font-size: 2.5rem;
+        color: $color-text;
+    }
+
+    .archive-description {
+        color: $color-text-light;
+        font-size: $font-size-md;
+        margin: 0;
+    }
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+    padding: 12px 24px;
+    font-size: $font-size-base;
+    font-weight: 500;
+    text-decoration: none;
+    border: none;
+    border-radius: $border-radius-md;
+    cursor: pointer;
+    @include transition(all);
+    @include box-shadow;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        text-decoration: none;
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+
+    &.btn-primary {
+        background: $color-primary;
+        color: $color-bg;
+
+        &:hover {
+            background: $color-primary-dark;
+            color: $color-bg;
+        }
+    }
+
+    &.btn-secondary {
+        background: $color-secondary;
+        color: $color-bg;
+
+        &:hover {
+            background: $color-secondary-dark;
+            color: $color-bg;
+        }
+    }
+
+    &.btn-outline {
+        background: transparent;
+        border: 2px solid $color-primary;
+        color: $color-primary;
+
+        &:hover {
+            background: $color-primary;
+            color: $color-bg;
+        }
+    }
+
+    .dashicons {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+    }
+}
+
+/* ==========================================================================
+   Forms
+   ========================================================================== */
+
+input[type="text"],
+input[type="email"],
+input[type="url"],
+input[type="tel"],
+input[type="number"],
+textarea,
+select {
+    width: 100%;
+    padding: 10px 15px;
+    font-size: $font-size-base;
+    font-family: $font-family-base;
+    color: $color-text;
+    background: $color-bg;
+    border: 1px solid $color-border;
+    border-radius: $border-radius-sm;
+    @include transition(border-color);
+
+    &:focus {
+        outline: none;
+        border-color: $color-primary;
+        box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+    }
+
+    &::placeholder {
+        color: $color-text-light;
+    }
+}
+
+textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+label {
+    display: block;
+    margin-bottom: $spacing-xs;
+    font-weight: 500;
+    color: $color-text;
+}
+
+/* ==========================================================================
+   Cards
+   ========================================================================== */
+
+.card {
+    background: $color-bg;
+    border-radius: $border-radius-lg;
+    padding: $spacing-xl;
+    @include box-shadow;
+
+    &-header {
+        margin-bottom: $spacing-lg;
+        padding-bottom: $spacing-md;
+        border-bottom: 1px solid $color-border;
+
+        h2, h3 {
+            margin: 0;
+        }
+    }
+
+    &-body {
+        margin-bottom: $spacing-lg;
+    }
+
+    &-footer {
+        margin-top: $spacing-lg;
+        padding-top: $spacing-md;
+        border-top: 1px solid $color-border;
+    }
+}
+
+/* ==========================================================================
+   Utilities
+   ========================================================================== */
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.mt-0 { margin-top: 0; }
+.mt-sm { margin-top: $spacing-sm; }
+.mt-md { margin-top: $spacing-md; }
+.mt-lg { margin-top: $spacing-lg; }
+.mt-xl { margin-top: $spacing-xl; }
+
+.mb-0 { margin-bottom: 0; }
+.mb-sm { margin-bottom: $spacing-sm; }
+.mb-md { margin-bottom: $spacing-md; }
+.mb-lg { margin-bottom: $spacing-lg; }
+.mb-xl { margin-bottom: $spacing-xl; }
+
+.pt-0 { padding-top: 0; }
+.pt-sm { padding-top: $spacing-sm; }
+.pt-md { padding-top: $spacing-md; }
+.pt-lg { padding-top: $spacing-lg; }
+.pt-xl { padding-top: $spacing-xl; }
+
+.pb-0 { padding-bottom: 0; }
+.pb-sm { padding-bottom: $spacing-sm; }
+.pb-md { padding-bottom: $spacing-md; }
+.pb-lg { padding-bottom: $spacing-lg; }
+.pb-xl { padding-bottom: $spacing-xl; }
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media screen and (max-width: 1024px) {
+    .container {
+        padding: 0 $spacing-md;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    h2 {
+        font-size: 1.75rem;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .container {
+        padding: 0 $spacing-sm;
+    }
+
+    h1 {
+        font-size: 1.75rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    .site-main {
+        padding: $spacing-xl 0;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    h2 {
+        font-size: 1.25rem;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        font-size: $font-size-sm;
+    }
+}
+

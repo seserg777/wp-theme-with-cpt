@@ -18,7 +18,6 @@
          */
         init: function () {
             this.bindEvents();
-            console.log('MyTheme initialized with jQuery ' + $.fn.jquery);
         },
 
         /**
@@ -34,7 +33,6 @@
          * Document ready handler
          */
         onDocumentReady: function () {
-            console.log('Document ready');
             // Add your code here
         },
 
@@ -42,7 +40,6 @@
          * Window load handler
          */
         onWindowLoad: function () {
-            console.log('Window loaded');
             // Add your code here
         },
 

@@ -13,12 +13,6 @@ get_header(); ?>
     <div class="container">
         <header class="page-header">
             <h1 class="page-title"><?php post_type_archive_title(); ?></h1>
-            <?php
-            $description = get_the_archive_description();
-            if ($description) :
-                ?>
-                <div class="archive-description"><?php echo wp_kses_post($description); ?></div>
-            <?php endif; ?>
         </header>
 
         <?php if (have_posts()) : ?>
@@ -30,12 +24,8 @@ get_header(); ?>
                                 <?php esc_html_e('Name', 'mytheme'); ?>
                                 <span class="sort-icon"></span>
                             </th>
-                            <th class="places-col-street sortable" data-sort="street">
-                                <?php esc_html_e('Street', 'mytheme'); ?>
-                                <span class="sort-icon"></span>
-                            </th>
-                            <th class="places-col-number sortable" data-sort="number">
-                                <?php esc_html_e('Number', 'mytheme'); ?>
+                            <th class="places-col-address sortable" data-sort="address">
+                                <?php esc_html_e('Address', 'mytheme'); ?>
                                 <span class="sort-icon"></span>
                             </th>
                             <th class="places-col-region sortable" data-sort="region">
@@ -95,4 +85,3 @@ get_header(); ?>
 </main>
 
 <?php get_footer(); ?>
-

@@ -89,6 +89,14 @@ class Theme
      */
     public function enqueueScripts(): void
     {
+        // Enqueue theme main stylesheet.
+        wp_enqueue_style(
+            'mytheme-theme',
+            get_template_directory_uri() . '/dist/css/theme.min.css',
+            array(),
+            '1.0.0'
+        );
+
         // Enqueue jQuery 3.7.1.
         wp_deregister_script('jquery');
         wp_register_script(
@@ -112,7 +120,6 @@ class Theme
             // Enqueue places styles and scripts on places pages.
             if (is_post_type_archive('places') || 
                 is_singular('places') || 
-                is_tax('places_category') ||
                 get_query_var('edit_place')) {
                 // Enqueue dashicons for action buttons.
                 wp_enqueue_style('dashicons');
@@ -125,7 +132,7 @@ class Theme
                 );
 
                 // Enqueue places script for load more functionality.
-                if (is_post_type_archive('places') || is_tax('places_category')) {
+                if (is_post_type_archive('places')) {
                     wp_enqueue_script(
                         'mytheme-places',
                         get_template_directory_uri() . '/dist/js/places.min.js',
@@ -137,18 +144,35 @@ class Theme
             }
 
         // Localize script for AJAX.
+        // Use original domain for AJAX to work with BrowserSync.
+        $ajax_url = admin_url('admin-ajax.php');
+        
+        // If we're on BrowserSync proxy (localhost:3000), use original domain from referer.
+        if (isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) {
+            // Get WordPress site URL from database (always correct).
+            $site_url = get_option('siteurl');
+            if ($site_url) {
+                $ajax_url = trailingslashit($site_url) . 'wp-admin/admin-ajax.php';
+            }
+        }
+        
         wp_localize_script(
             'mytheme-main',
             'mythemeData',
-            [
-                'ajaxUrl'  => admin_url('admin-ajax.php'),
+            array(
+                'ajaxUrl'  => $ajax_url,
                 'siteUrl'  => home_url(),
+                'loginUrl' => wp_login_url(),
                 'nonce'    => wp_create_nonce('mytheme-nonce'),
-                'i18n'     => [
-                    'save'      => __('Save', 'mytheme'),
-                    'saving'    => __('Saving...', 'mytheme'),
-                ],
-            ]
+                'i18n'     => array(
+                    'save'         => __('Save', 'mytheme'),
+                    'saving'       => __('Saving...', 'mytheme'),
+                    'authRequired' => __('Please log in to edit this place.', 'mytheme'),
+                    'authTitle'    => __('Authentication Required', 'mytheme'),
+                    'loginButton'  => __('Log In', 'mytheme'),
+                    'cancelButton' => __('Cancel', 'mytheme'),
+                ),
+            )
         );
     }
 

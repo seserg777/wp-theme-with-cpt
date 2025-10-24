@@ -190,15 +190,97 @@
 
     /**
      * Places Edit functionality
-     * Note: Edit links now work as regular links, no JavaScript needed
+     * Handles disabled edit buttons for non-authenticated users
      */
     const PlacesEdit = {
         /**
          * Initialize
          */
         init: function () {
-            // No JavaScript needed for edit links
-            // They work as regular <a> tags
+            this.handleDisabledButtons();
+        },
+
+        /**
+         * Handle clicks on disabled edit buttons
+         */
+        handleDisabledButtons: function () {
+            $(document).on('click', '.places-edit-btn[data-auth-required]', function (e) {
+                e.preventDefault();
+                
+                // Show authentication required message
+                PlacesEdit.showAuthMessage();
+                
+                return false;
+            });
+        },
+
+        /**
+         * Show authentication required message
+         */
+        showAuthMessage: function () {
+            const message = mythemeData.i18n?.authRequired || 'Please log in to edit this place.';
+            const loginUrl = mythemeData.loginUrl || '/wp-login.php';
+            
+            // Create modal overlay
+            const modal = $('<div class="places-auth-modal"></div>');
+            const modalContent = $('<div class="places-auth-modal-content"></div>');
+            
+            modalContent.html(`
+                <div class="places-auth-modal-icon">
+                    <span class="dashicons dashicons-lock"></span>
+                </div>
+                <h3 class="places-auth-modal-title">${mythemeData.i18n?.authTitle || 'Authentication Required'}</h3>
+                <p class="places-auth-modal-message">${message}</p>
+                <div class="places-auth-modal-actions">
+                    <a href="${loginUrl}?redirect_to=${encodeURIComponent(window.location.href)}" class="places-auth-modal-btn places-auth-btn-login">
+                        ${mythemeData.i18n?.loginButton || 'Log In'}
+                    </a>
+                    <button type="button" class="places-auth-modal-btn places-auth-btn-cancel">
+                        ${mythemeData.i18n?.cancelButton || 'Cancel'}
+                    </button>
+                </div>
+            `);
+            
+            modal.append(modalContent);
+            $('body').append(modal);
+            
+            // Fade in modal
+            setTimeout(() => {
+                modal.addClass('active');
+            }, 10);
+            
+            // Close modal on cancel
+            modal.on('click', '.places-auth-btn-cancel', function () {
+                PlacesEdit.closeAuthModal(modal);
+            });
+            
+            // Close modal on overlay click
+            modal.on('click', function (e) {
+                if ($(e.target).is('.places-auth-modal')) {
+                    PlacesEdit.closeAuthModal(modal);
+                }
+            });
+            
+            // Close on Escape key
+            $(document).on('keydown.authModal', function (e) {
+                if (e.key === 'Escape') {
+                    PlacesEdit.closeAuthModal(modal);
+                }
+            });
+        },
+
+        /**
+         * Close authentication modal
+         * 
+         * @param {jQuery} modal Modal element
+         */
+        closeAuthModal: function (modal) {
+            modal.removeClass('active');
+            
+            setTimeout(() => {
+                modal.remove();
+                $(document).off('keydown.authModal');
+            }, 300);
         }
     };
 
@@ -207,10 +289,4 @@
         PlacesLoadMore.init();
         PlacesEdit.init();
     });
-
-    // Initialize on window load.
-    $(window).on('load', function () {
-        console.log('Window loaded');
-    });
-
 })(jQuery);

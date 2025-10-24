@@ -36,8 +36,7 @@ class PlacesPostType extends PostTypeBase
         $this->args = [
             'description'         => __('Places with address and details', 'mytheme'),
             'menu_icon'           => 'dashicons-location',
-            'supports'            => ['title', 'editor', 'thumbnail', 'excerpt'],
-            'taxonomies'          => ['places_category'],
+            'supports'            => ['title', 'thumbnail'],
             'rewrite'             => [
                 'slug'       => 'places',
                 'with_front' => false,
@@ -63,7 +62,6 @@ class PlacesPostType extends PostTypeBase
     {
         parent::registerHooks();
         
-        add_action('init', [$this, 'registerTaxonomy']);
         add_action('add_meta_boxes', [$this, 'addMetaBoxes']);
         add_action('save_post_' . $this->postType, [$this, 'saveMetaBox'], 10, 2);
         add_action('admin_enqueue_scripts', [$this, 'enqueueAdminScripts']);
@@ -75,6 +73,9 @@ class PlacesPostType extends PostTypeBase
         // AJAX handlers for frontend editing.
         add_action('wp_ajax_update_place', [$this, 'ajaxUpdatePlace']);
         
+        // Modify main query for archive sorting.
+        add_action('pre_get_posts', [$this, 'modifyArchiveQuery']);
+        
         // Flush rewrite rules on theme activation.
         add_action('after_switch_theme', [$this, 'flushRewriteRules']);
         
@@ -83,41 +84,86 @@ class PlacesPostType extends PostTypeBase
     }
 
     /**
-     * Register custom taxonomy for places
+     * Modify main query for Places archive sorting
      *
+     * @param \WP_Query $query The WP_Query instance.
      * @return void
      */
-    public function registerTaxonomy(): void
+    public function modifyArchiveQuery(\WP_Query $query): void
     {
-        $labels = [
-            'name'              => __('Place Categories', 'mytheme'),
-            'singular_name'     => __('Place Category', 'mytheme'),
-            'search_items'      => __('Search Categories', 'mytheme'),
-            'all_items'         => __('All Categories', 'mytheme'),
-            'parent_item'       => __('Parent Category', 'mytheme'),
-            'parent_item_colon' => __('Parent Category:', 'mytheme'),
-            'edit_item'         => __('Edit Category', 'mytheme'),
-            'update_item'       => __('Update Category', 'mytheme'),
-            'add_new_item'      => __('Add New Category', 'mytheme'),
-            'new_item_name'     => __('New Category Name', 'mytheme'),
-            'menu_name'         => __('Categories', 'mytheme'),
-        ];
-
-        $args = [
-            'hierarchical'      => true,
-            'labels'            => $labels,
-            'show_ui'           => true,
-            'show_admin_column' => true,
-            'query_var'         => true,
-            'rewrite'           => [
-                'slug'       => 'places-category',
-                'with_front' => false,
-                'hierarchical' => true,
-            ],
-            'show_in_rest'      => true,
-        ];
-
-        register_taxonomy('places_category', [$this->postType], $args);
+        // Only modify main query on frontend for Places archive.
+        if (is_admin() || ! $query->is_main_query()) {
+            return;
+        }
+        
+        // Check if this is Places archive.
+        if ( ! is_post_type_archive($this->postType)) {
+            return;
+        }
+        
+        // Get sorting parameters from URL.
+        $order_by = get_query_var('orderby');
+        $order    = strtoupper(get_query_var('order', 'DESC'));
+        
+        // Validate order parameter.
+        if ( ! in_array($order, array( 'ASC', 'DESC' ), true)) {
+            $order = 'DESC';
+        }
+        
+        // Handle sorting for meta fields.
+        if (in_array($order_by, array( 'address', 'region', 'nip' ), true)) {
+            $meta_key  = '_places_' . $order_by;
+            $post_type = $this->postType;
+            
+            // Set custom orderby flag.
+            $query->set('orderby', 'meta_value_custom');
+            $query->set('meta_key_custom', $meta_key);
+            $query->set('order_custom', $order);
+            
+            // Create filter to modify JOIN - use LEFT JOIN to include posts without meta.
+            $filter_join = function ( $join, $wp_query ) use ( $meta_key, $post_type, $query ) {
+                global $wpdb;
+                
+                // Only modify if this is the same query.
+                if ($wp_query === $query && $wp_query->get('post_type') === $post_type && $wp_query->get('orderby') === 'meta_value_custom') {
+                    // Add LEFT JOIN for meta table with prepared statement.
+                    $join .= $wpdb->prepare(
+                        " LEFT JOIN {$wpdb->postmeta} AS mt_sort ON ({$wpdb->posts}.ID = mt_sort.post_id AND mt_sort.meta_key = %s)",
+                        $meta_key
+                    );
+                }
+                
+                return $join;
+            };
+            
+            // Create filter to sort with proper empty value handling.
+            $filter_orderby = function ( $orderby_statement, $wp_query ) use ( $meta_key, $order, $post_type, $query ) {
+                global $wpdb;
+                
+                // Only modify if this is the same query.
+                if ($wp_query === $query && $wp_query->get('post_type') === $post_type && $wp_query->get('orderby') === 'meta_value_custom') {
+                    // For ASC: non-empty first, empty last (0 < 1).
+                    // For DESC: empty first, non-empty last (1 > 0).
+                    $empty_order       = 'ASC' === $order ? 'ASC' : 'DESC';
+                    $orderby_statement = "CASE WHEN mt_sort.meta_value IS NULL OR mt_sort.meta_value = '' THEN 1 ELSE 0 END {$empty_order}, mt_sort.meta_value {$order}, {$wpdb->posts}.post_date DESC";
+                }
+                
+                return $orderby_statement;
+            };
+            
+            // Add filters.
+            add_filter('posts_join', $filter_join, 10, 2);
+            add_filter('posts_orderby', $filter_orderby, 10, 2);
+            
+            // Remove filters after query execution.
+            add_filter('posts_results', function ( $posts, $wp_query ) use ( $filter_join, $filter_orderby, $query ) {
+                if ($wp_query === $query) {
+                    remove_filter('posts_join', $filter_join, 10);
+                    remove_filter('posts_orderby', $filter_orderby, 10);
+                }
+                return $posts;
+            }, 10, 2);
+        }
     }
 
     /**
@@ -162,8 +208,8 @@ class PlacesPostType extends PostTypeBase
 
         wp_enqueue_style(
             'places-admin',
-            get_template_directory_uri() . '/assets/css/places-admin.css',
-            ['mytheme-admin'],
+            get_template_directory_uri() . '/dist/css/places-admin.min.css',
+            array( 'mytheme-admin' ),
             '1.0.0'
         );
     }
@@ -195,8 +241,7 @@ class PlacesPostType extends PostTypeBase
     {
         wp_nonce_field('places_meta_box', 'places_meta_box_nonce');
 
-        $street = get_post_meta($post->ID, '_places_street', true);
-        $number = get_post_meta($post->ID, '_places_number', true);
+        $address = get_post_meta($post->ID, '_places_address', true);
         $nip = get_post_meta($post->ID, '_places_nip', true);
         $region = get_post_meta($post->ID, '_places_region', true);
         ?>
@@ -205,31 +250,16 @@ class PlacesPostType extends PostTypeBase
                 <h4><?php esc_html_e('Address', 'mytheme'); ?></h4>
                 
                 <div class="places-field-row">
-                    <div class="places-field places-field-wide">
-                        <label for="places_street">
-                            <?php esc_html_e('Street:', 'mytheme'); ?>
+                    <div class="places-field places-field-full">
+                        <label for="places_address">
+                            <?php esc_html_e('Address:', 'mytheme'); ?>
                             <span class="required">*</span>
                         </label>
                         <input 
                             type="text" 
-                            id="places_street" 
-                            name="places_street" 
-                            value="<?php echo esc_attr($street); ?>" 
-                            class="widefat"
-                            required
-                        />
-                    </div>
-                    
-                    <div class="places-field places-field-narrow">
-                        <label for="places_number">
-                            <?php esc_html_e('Number:', 'mytheme'); ?>
-                            <span class="required">*</span>
-                        </label>
-                        <input 
-                            type="text" 
-                            id="places_number" 
-                            name="places_number" 
-                            value="<?php echo esc_attr($number); ?>" 
+                            id="places_address" 
+                            name="places_address" 
+                            value="<?php echo esc_attr($address); ?>" 
                             class="widefat"
                             required
                         />
@@ -255,9 +285,6 @@ class PlacesPostType extends PostTypeBase
                             placeholder="0000000000"
                             maxlength="10"
                         />
-                        <span class="description">
-                            <?php esc_html_e('10-digit tax identification number', 'mytheme'); ?>
-                        </span>
                     </div>
                     
                     <div class="places-field places-field-half">
@@ -276,11 +303,6 @@ class PlacesPostType extends PostTypeBase
                     </div>
                 </div>
             </div>
-            
-            <p class="description">
-                <span class="required">*</span> 
-                <?php esc_html_e('Required fields', 'mytheme'); ?>
-            </p>
         </div>
         <?php
     }
@@ -310,21 +332,12 @@ class PlacesPostType extends PostTypeBase
             return;
         }
 
-        // Save street.
-        if (isset($_POST['places_street'])) {
+        // Save address.
+        if (isset($_POST['places_address'])) {
             update_post_meta(
                 $postId,
-                '_places_street',
-                sanitize_text_field($_POST['places_street'])
-            );
-        }
-
-        // Save number.
-        if (isset($_POST['places_number'])) {
-            update_post_meta(
-                $postId,
-                '_places_number',
-                sanitize_text_field($_POST['places_number'])
+                '_places_address',
+                sanitize_text_field($_POST['places_address'])
             );
         }
 
@@ -348,24 +361,6 @@ class PlacesPostType extends PostTypeBase
     }
 
     /**
-     * Get full address for a place
-     *
-     * @param int $postId Post ID.
-     * @return string
-     */
-    public static function getFullAddress(int $postId): string
-    {
-        $street = get_post_meta($postId, '_places_street', true);
-        $number = get_post_meta($postId, '_places_number', true);
-        
-        if (empty($street) || empty($number)) {
-            return '';
-        }
-        
-        return sprintf('%s %s', $street, $number);
-    }
-
-    /**
      * Get place details
      *
      * @param int $postId Post ID.
@@ -374,10 +369,9 @@ class PlacesPostType extends PostTypeBase
     public static function getPlaceDetails(int $postId): array
     {
         return [
-            'street' => get_post_meta($postId, '_places_street', true),
-            'number' => get_post_meta($postId, '_places_number', true),
-            'nip'    => get_post_meta($postId, '_places_nip', true),
-            'region' => get_post_meta($postId, '_places_region', true),
+            'address' => get_post_meta($postId, '_places_address', true),
+            'nip'     => get_post_meta($postId, '_places_nip', true),
+            'region'  => get_post_meta($postId, '_places_region', true),
         ];
     }
 
@@ -389,57 +383,96 @@ class PlacesPostType extends PostTypeBase
     public function ajaxLoadMorePlaces(): void
     {
         // Verify nonce.
-        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'mytheme-nonce')) {
-            wp_send_json_error(['message' => __('Security check failed', 'mytheme')]);
+        if ( ! isset($_POST['nonce']) || ! wp_verify_nonce($_POST['nonce'], 'mytheme-nonce')) {
+            wp_send_json_error(array( 'message' => __('Security check failed', 'mytheme') ));
             return;
         }
 
         // Get parameters.
-        $paged = isset($_POST['page']) ? absint($_POST['page']) : 1;
-        $postsPerPage = isset($_POST['posts_per_page']) ? absint($_POST['posts_per_page']) : get_option('posts_per_page');
-        $category = isset($_POST['category']) ? sanitize_text_field($_POST['category']) : '';
-        $orderby = isset($_POST['orderby']) ? sanitize_text_field($_POST['orderby']) : 'date';
-        $order = isset($_POST['order']) ? strtoupper(sanitize_text_field($_POST['order'])) : 'DESC';
+        $paged          = isset($_POST['page']) ? absint($_POST['page']) : 1;
+        $posts_per_page = isset($_POST['posts_per_page']) ? absint($_POST['posts_per_page']) : get_option('posts_per_page');
+        $order_by       = isset($_POST['orderby']) ? sanitize_text_field($_POST['orderby']) : 'date';
+        $order          = isset($_POST['order']) ? strtoupper(sanitize_text_field($_POST['order'])) : 'DESC';
         
         // Validate order parameter.
-        if (!in_array($order, ['ASC', 'DESC'])) {
+        if ( ! in_array($order, array( 'ASC', 'DESC' ), true)) {
             $order = 'DESC';
         }
 
         // Build query arguments.
-        $args = [
+        $args = array(
             'post_type'      => $this->postType,
-            'posts_per_page' => $postsPerPage,
+            'posts_per_page' => $posts_per_page,
             'paged'          => $paged,
             'post_status'    => 'publish',
             'order'          => $order,
-        ];
+        );
 
         // Handle sorting.
-        if (in_array($orderby, ['street', 'number', 'region', 'nip'])) {
-            $args['meta_key'] = '_places_' . $orderby;
-            $args['orderby'] = 'meta_value';
+        $filter_join    = null;
+        $filter_orderby = null;
+        
+        if (in_array($order_by, array( 'address', 'region', 'nip' ), true)) {
+            $meta_key  = '_places_' . $order_by;
+            $post_type = $this->postType;
+            
+            // Set custom orderby flag.
+            $args['orderby']         = 'meta_value_custom';
+            $args['meta_key_custom'] = $meta_key;
+            $args['order_custom']    = $order;
+            
+            // Create filter to modify JOIN - use LEFT JOIN to include posts without meta.
+            $filter_join = function ( $join, $query ) use ( $meta_key, $post_type ) {
+                global $wpdb;
+                
+                // Check if this is our query.
+                if ($query->get('post_type') === $post_type && $query->get('orderby') === 'meta_value_custom') {
+                    // Add LEFT JOIN for meta table with prepared statement.
+                    $join .= $wpdb->prepare(
+                        " LEFT JOIN {$wpdb->postmeta} AS mt_sort ON ({$wpdb->posts}.ID = mt_sort.post_id AND mt_sort.meta_key = %s)",
+                        $meta_key
+                    );
+                }
+                
+                return $join;
+            };
+            
+            // Create filter to sort with proper empty value handling.
+            $filter_orderby = function ( $orderby_statement, $query ) use ( $meta_key, $order, $post_type ) {
+                global $wpdb;
+                
+                // Check if this is our query.
+                if ($query->get('post_type') === $post_type && $query->get('orderby') === 'meta_value_custom') {
+                    // For ASC: non-empty first, empty last (0 < 1).
+                    // For DESC: empty first, non-empty last (1 > 0).
+                    $empty_order       = 'ASC' === $order ? 'ASC' : 'DESC';
+                    $orderby_statement = "CASE WHEN mt_sort.meta_value IS NULL OR mt_sort.meta_value = '' THEN 1 ELSE 0 END {$empty_order}, mt_sort.meta_value {$order}, {$wpdb->posts}.post_date DESC";
+                }
+                
+                return $orderby_statement;
+            };
+            
+            // Add filters.
+            add_filter('posts_join', $filter_join, 10, 2);
+            add_filter('posts_orderby', $filter_orderby, 10, 2);
         } else {
-            $args['orderby'] = $orderby;
-        }
-
-        // Add category filter if provided.
-        if (!empty($category)) {
-            $args['tax_query'] = [
-                [
-                    'taxonomy' => 'places_category',
-                    'field'    => 'slug',
-                    'terms'    => $category,
-                ],
-            ];
+            $args['orderby'] = $order_by;
         }
 
         // Execute query.
         $query = new \WP_Query($args);
+        
+        // Remove filters after query execution.
+        if ($filter_join) {
+            remove_filter('posts_join', $filter_join, 10);
+        }
+        if ($filter_orderby) {
+            remove_filter('posts_orderby', $filter_orderby, 10);
+        }
 
         // Check if posts exist.
-        if (!$query->have_posts()) {
-            wp_send_json_error(['message' => __('No more places found', 'mytheme')]);
+        if ( ! $query->have_posts()) {
+            wp_send_json_error(array( 'message' => __('No more places found', 'mytheme') ));
             return;
         }
 
@@ -459,13 +492,13 @@ class PlacesPostType extends PostTypeBase
         $html = ob_get_clean();
 
         // Prepare response data.
-        $response = [
-            'html'       => $html,
-            'has_more'   => $paged < $query->max_num_pages,
-            'next_page'  => $paged + 1,
-            'max_pages'  => $query->max_num_pages,
+        $response = array(
+            'html'        => $html,
+            'has_more'    => $paged < $query->max_num_pages,
+            'next_page'   => $paged + 1,
+            'max_pages'   => $query->max_num_pages,
             'found_posts' => $query->found_posts,
-        ];
+        );
 
         wp_send_json_success($response);
     }
@@ -479,7 +512,6 @@ class PlacesPostType extends PostTypeBase
     public static function renderPlaceItem(int $postId): void
     {
         $placeDetails = self::getPlaceDetails($postId);
-        $fullAddress = self::getFullAddress($postId);
         ?>
         <tr id="post-<?php echo esc_attr($postId); ?>" <?php post_class('places-table-row'); ?>>
             <td class="places-col-name">
@@ -487,11 +519,8 @@ class PlacesPostType extends PostTypeBase
                     <?php echo esc_html(get_the_title($postId)); ?>
                 </a>
             </td>
-            <td class="places-col-street">
-                <?php echo esc_html($placeDetails['street']); ?>
-            </td>
-            <td class="places-col-number">
-                <?php echo esc_html($placeDetails['number']); ?>
+            <td class="places-col-address">
+                <?php echo esc_html($placeDetails['address']); ?>
             </td>
             <td class="places-col-region">
                 <?php echo esc_html($placeDetails['region']); ?>
@@ -505,18 +534,18 @@ class PlacesPostType extends PostTypeBase
                         <span class="dashicons dashicons-visibility"></span>
                         <span class="btn-text"><?php esc_html_e('View', 'mytheme'); ?></span>
                     </a>
-                    <?php if (current_user_can('edit_post', $postId)) : ?>
-                        <?php 
-                        $post_slug = get_post_field('post_name', $postId);
-                        $edit_url = home_url('/places/' . $post_slug . '/edit/');
-                        ?>
-                        <a href="<?php echo esc_url($edit_url); ?>" 
-                           class="places-action-btn places-edit-btn" 
-                           title="<?php esc_attr_e('Edit', 'mytheme'); ?>">
-                            <span class="dashicons dashicons-edit"></span>
-                            <span class="btn-text"><?php esc_html_e('Edit', 'mytheme'); ?></span>
-                        </a>
-                    <?php endif; ?>
+                    <?php 
+                    $post_slug = get_post_field('post_name', $postId);
+                    $edit_url  = home_url('/places/' . $post_slug . '/edit/');
+                    $can_edit  = current_user_can('edit_post', $postId);
+                    ?>
+                    <a href="<?php echo $can_edit ? esc_url($edit_url) : '#'; ?>" 
+                       class="places-action-btn places-edit-btn<?php echo ! $can_edit ? ' disabled' : ''; ?>" 
+                       title="<?php esc_attr_e('Edit', 'mytheme'); ?>"
+                       <?php echo ! $can_edit ? 'data-auth-required="true"' : ''; ?>>
+                        <span class="dashicons dashicons-edit"></span>
+                        <span class="btn-text"><?php esc_html_e('Edit', 'mytheme'); ?></span>
+                    </a>
                 </div>
             </td>
         </tr>
@@ -566,8 +595,7 @@ class PlacesPostType extends PostTypeBase
 
         // Get and sanitize data.
         $title = isset($_POST['title']) ? sanitize_text_field($_POST['title']) : '';
-        $street = isset($_POST['street']) ? sanitize_text_field($_POST['street']) : '';
-        $number = isset($_POST['number']) ? sanitize_text_field($_POST['number']) : '';
+        $address = isset($_POST['address']) ? sanitize_text_field($_POST['address']) : '';
         $region = isset($_POST['region']) ? sanitize_text_field($_POST['region']) : '';
         $nip = isset($_POST['nip']) ? sanitize_text_field($_POST['nip']) : '';
         
@@ -575,7 +603,7 @@ class PlacesPostType extends PostTypeBase
         $nip = preg_replace('/[^0-9]/', '', $nip);
 
         // Validate required fields.
-        if (empty($title) || empty($street) || empty($number) || empty($region)) {
+        if (empty($title) || empty($address) || empty($region)) {
             wp_send_json_error(['message' => __('Please fill in all required fields', 'mytheme')]);
             return;
         }
@@ -598,8 +626,7 @@ class PlacesPostType extends PostTypeBase
         }
 
         // Update meta fields.
-        update_post_meta($postId, '_places_street', $street);
-        update_post_meta($postId, '_places_number', $number);
+        update_post_meta($postId, '_places_address', $address);
         update_post_meta($postId, '_places_region', $region);
         update_post_meta($postId, '_places_nip', $nip);
 
@@ -609,12 +636,11 @@ class PlacesPostType extends PostTypeBase
         wp_send_json_success([
             'message' => __('Place updated successfully', 'mytheme'),
             'data'    => [
-                'id'     => $postId,
-                'title'  => get_the_title($postId),
-                'street' => $placeDetails['street'],
-                'number' => $placeDetails['number'],
-                'region' => $placeDetails['region'],
-                'nip'    => $placeDetails['nip'],
+                'id'      => $postId,
+                'title'   => get_the_title($postId),
+                'address' => $placeDetails['address'],
+                'region'  => $placeDetails['region'],
+                'nip'     => $placeDetails['nip'],
             ],
         ]);
     }
