@@ -12,15 +12,18 @@ A modern, object-oriented WordPress theme built following WordPress Coding Stand
 - ✅ Custom Post Types with OOP architecture
 - ✅ Autoloader for automatic class loading
 - ✅ jQuery 3.7.1 integration
-- ✅ Custom taxonomies support
 - ✅ Meta boxes for custom fields
 - ✅ WordPress Coding Standards compliant
 - ✅ Gutenberg/Block Editor support
-- ✅ Webpack 5 build system
+- ✅ Webpack 5 build system with BrowserSync
 - ✅ SCSS with variables and mixins
 - ✅ ES6+ JavaScript with Babel
 - ✅ Autoprefixer for cross-browser compatibility
 - ✅ Minification and optimization
+- ✅ Hot reload and live browser refresh
+- ✅ Advanced sorting with empty values handling
+- ✅ AJAX-powered table with load more functionality
+- ✅ Authentication modals for restricted actions
 
 ## Structure
 
@@ -33,31 +36,41 @@ mytheme/
 │   ├── templates/
 │   │   ├── single-places.php            # Single place template
 │   │   ├── edit-place.php               # Frontend edit template
-│   │   ├── archive-places.php           # Places archive template
-│   │   ├── taxonomy-places_category.php # Category taxonomy template
+│   │   ├── archive-places.php           # Places archive with AJAX table
 │   │   └── README.md                    # Templates documentation
-│   ├── class-autoloader.php              # PSR-4 autoloader
-│   ├── class-theme.php                   # Main theme class
-│   └── class-templates.php               # Template loader class
+│   ├── class-autoloader.php             # PSR-4 autoloader
+│   ├── class-theme.php                  # Main theme class
+│   └── class-templates.php              # Template loader class
 ├── src/
-│   ├── js/                               # Source JavaScript files
-│   │   ├── main.js                       # Main JS
-│   │   ├── admin.js                      # Admin JS
-│   │   └── places.js                     # Places JS
-│   └── scss/                             # Source SCSS files
-│       ├── _variables.scss               # SCSS variables
-│       ├── _mixins.scss                  # SCSS mixins
-│       ├── admin.scss                    # Admin styles
-│       ├── places-admin.scss             # Places admin styles
-│       └── places.scss                   # Places frontend styles
-├── dist/                                 # Compiled assets (auto-generated)
-│   ├── js/                               # Minified JavaScript
-│   └── css/                              # Minified CSS
-├── functions.php                         # Theme setup
-├── style.css                             # Theme stylesheet
-├── index.php                             # Main template
-├── header.php                            # Header template
-└── footer.php                            # Footer template
+│   ├── js/                              # Source JavaScript files
+│   │   ├── main.js                      # Main JS
+│   │   ├── admin.js                     # Admin JS
+│   │   └── places.js                    # Places JS with AJAX & modals
+│   └── scss/                            # Source SCSS files
+│       ├── _variables.scss              # SCSS variables
+│       ├── _mixins.scss                 # SCSS mixins
+│       ├── theme.scss                   # Main theme styles
+│       ├── style.scss                   # Additional styles
+│       ├── admin.scss                   # Admin styles
+│       ├── places-admin.scss            # Places admin styles
+│       └── places.scss                  # Places frontend styles
+├── dist/                                # Compiled assets (auto-generated, gitignored)
+│   ├── js/                              # Minified JavaScript
+│   │   ├── main.min.js
+│   │   ├── places.min.js
+│   │   └── ...
+│   └── css/                             # Minified CSS
+│       ├── theme.min.css
+│       ├── places-styles.min.css
+│       └── ...
+├── node_modules/                        # NPM dependencies (gitignored)
+├── package.json                         # NPM configuration
+├── webpack.config.js                    # Webpack configuration
+├── functions.php                        # Theme setup
+├── style.css                            # Theme stylesheet header
+├── index.php                            # Main template
+├── header.php                           # Header template
+└── footer.php                           # Footer template
 ```
 
 ## Templates
@@ -73,16 +86,32 @@ The `MyTheme\Templates` class handles loading custom templates:
 
 ### Available Templates
 
-- **single-places.php** - Single place view with table layout
-- **edit-place.php** - Frontend editing interface for places
-- **archive-places.php** - Places archive with sortable table
-- **taxonomy-places_category.php** - Places category taxonomy archive
+- **single-places.php** - Single place view with details table
+- **edit-place.php** - Frontend editing interface for authenticated users
+- **archive-places.php** - Places archive with sortable AJAX table and load more functionality
 
 ## Custom Post Types
 
 ### Available Post Types
 
-- **Places** - Locations with address, NIP, and region information
+#### Places
+
+Custom post type for managing locations with advanced features:
+
+**Fields:**
+- Title (post title)
+- Address (meta field)
+- Region (meta field)
+- NIP / Tax ID (meta field)
+- Featured Image (thumbnail)
+
+**Features:**
+- ✅ Sortable table with AJAX load more
+- ✅ Smart sorting (non-empty values first on ASC, empty first on DESC)
+- ✅ Frontend editing for authenticated users
+- ✅ Authentication modal for non-logged users
+- ✅ Responsive design with mobile-friendly table
+- ✅ Real-time updates with BrowserSync integration
 
 ### Creating a New Custom Post Type
 
@@ -111,7 +140,7 @@ class YourPostType extends PostTypeBase
 
 ## Build System
 
-The theme uses Webpack 5 for modern asset compilation:
+The theme uses Webpack 5 with BrowserSync for modern asset compilation and live development:
 
 ### Development
 
@@ -119,29 +148,59 @@ The theme uses Webpack 5 for modern asset compilation:
 # Install dependencies
 npm install
 
-# Watch mode (development)
+# Watch mode with BrowserSync (auto-reload browser)
+npm run watch
+# or
 npm run dev
 
-# Production build
+# Watch mode without BrowserSync
+npm run watch:no-sync
+
+# Watch production mode with BrowserSync
+npm run watch:prod
+
+# Production build (one-time)
 npm run build
 
-# Development build (with source maps)
+# Development build with source maps (one-time)
 npm run build:dev
 ```
+
+### BrowserSync
+
+When running `npm run watch`, BrowserSync will:
+- Proxy your local WordPress site (`wp.loc`)
+- Open at `https://localhost:3000`
+- Auto-reload browser on PHP file changes
+- Hot-inject CSS changes without page reload
+- Provide UI panel at `http://localhost:3002`
 
 ### Asset Structure
 
 ```
-src/
-├── js/          # Source JavaScript files
-├── scss/        # Source SCSS files
-│   ├── _variables.scss
-│   ├── _mixins.scss
-│   └── *.scss
+src/                    # Source files (edit here)
+├── js/
+│   ├── main.js         # Main theme JavaScript
+│   ├── admin.js        # Admin JavaScript
+│   └── places.js       # Places AJAX, sorting, modals
+└── scss/
+    ├── _variables.scss # Variables (colors, spacing, fonts)
+    ├── _mixins.scss    # Mixins (transitions, shadows)
+    ├── theme.scss      # Main theme styles
+    ├── style.scss      # Additional styles
+    ├── admin.scss      # Admin panel styles
+    ├── places-admin.scss # Places admin styles
+    └── places.scss     # Places frontend styles
 
-dist/           # Compiled assets (auto-generated)
-├── js/         # Minified JavaScript
-└── css/        # Minified CSS with autoprefixer
+dist/                   # Compiled assets (auto-generated, gitignored)
+├── js/
+│   ├── main.min.js
+│   ├── places.min.js
+│   └── *.min.js.map    # Source maps
+└── css/
+    ├── theme.min.css
+    ├── places-styles.min.css
+    └── *.min.css.map   # Source maps
 ```
 
 ### Features
