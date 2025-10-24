@@ -66,11 +66,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     ];
     wp_update_post($post_data);
     
+    // Clean NIP - remove all non-digit characters
+    $nip = isset($_POST['nip']) ? sanitize_text_field($_POST['nip']) : '';
+    $nip = preg_replace('/[^0-9]/', '', $nip);
+    
     // Update meta fields
-    update_post_meta($place_id, '_place_street', sanitize_text_field($_POST['street']));
-    update_post_meta($place_id, '_place_number', sanitize_text_field($_POST['number']));
-    update_post_meta($place_id, '_place_region', sanitize_text_field($_POST['region']));
-    update_post_meta($place_id, '_place_nip', sanitize_text_field($_POST['nip']));
+    update_post_meta($place_id, '_places_street', sanitize_text_field($_POST['street']));
+    update_post_meta($place_id, '_places_number', sanitize_text_field($_POST['number']));
+    update_post_meta($place_id, '_places_region', sanitize_text_field($_POST['region']));
+    update_post_meta($place_id, '_places_nip', $nip);
     
     $success_message = __('Place updated successfully!', 'mytheme');
     
@@ -123,7 +127,7 @@ get_header();
                                            class="form-control" 
                                            id="edit-street" 
                                            name="street" 
-                                           value="<?php echo esc_attr(get_post_meta($place_id, '_place_street', true)); ?>" 
+                                           value="<?php echo esc_attr(get_post_meta($place_id, '_places_street', true)); ?>" 
                                            required />
                                 </div>
                             </div>
@@ -136,7 +140,7 @@ get_header();
                                            class="form-control" 
                                            id="edit-number" 
                                            name="number" 
-                                           value="<?php echo esc_attr(get_post_meta($place_id, '_place_number', true)); ?>" 
+                                           value="<?php echo esc_attr(get_post_meta($place_id, '_places_number', true)); ?>" 
                                            required />
                                 </div>
                             </div>
@@ -152,7 +156,7 @@ get_header();
                                            class="form-control" 
                                            id="edit-region" 
                                            name="region" 
-                                           value="<?php echo esc_attr(get_post_meta($place_id, '_place_region', true)); ?>" 
+                                           value="<?php echo esc_attr(get_post_meta($place_id, '_places_region', true)); ?>" 
                                            required />
                                 </div>
                             </div>
@@ -165,7 +169,7 @@ get_header();
                                            class="form-control" 
                                            id="edit-nip" 
                                            name="nip" 
-                                           value="<?php echo esc_attr(get_post_meta($place_id, '_place_nip', true)); ?>" />
+                                           value="<?php echo esc_attr(get_post_meta($place_id, '_places_nip', true)); ?>" />
                                 </div>
                             </div>
                         </div>

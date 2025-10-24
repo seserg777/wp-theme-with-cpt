@@ -20,11 +20,15 @@ new MyTheme\Autoloader();
 
 // Explicitly require necessary files.
 require_once get_template_directory() . '/inc/class-theme.php';
+require_once get_template_directory() . '/inc/class-templates.php';
 require_once get_template_directory() . '/inc/post-types/class-post-type-base.php';
 require_once get_template_directory() . '/inc/post-types/class-places-post-type.php';
 
 // Initialize theme.
 MyTheme\Theme::getInstance();
+
+// Initialize templates loader.
+new MyTheme\Templates();
 
 /**
  * Theme setup
@@ -150,18 +154,6 @@ function mytheme_add_edit_place_query_vars($vars)
     return $vars;
 }
 add_filter('query_vars', 'mytheme_add_edit_place_query_vars');
-
-/**
- * Handle edit place page template
- */
-function mytheme_handle_edit_place_template($template)
-{
-    if (get_query_var('edit_place')) {
-        return get_template_directory() . '/edit-place.php';
-    }
-    return $template;
-}
-add_filter('template_include', 'mytheme_handle_edit_place_template');
 
 /**
  * Simple approach: Add Places link via Custom Links

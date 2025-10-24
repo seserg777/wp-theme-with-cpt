@@ -331,10 +331,10 @@ class PlacesPostType extends PostTypeBase
         // Save NIP.
         if (isset($_POST['places_nip'])) {
             $nip = sanitize_text_field($_POST['places_nip']);
-            // Validate NIP format (10 digits).
-            if (empty($nip) || preg_match('/^\d{10}$/', $nip)) {
-                update_post_meta($postId, '_places_nip', $nip);
-            }
+            // Remove all non-digit characters.
+            $nip = preg_replace('/[^0-9]/', '', $nip);
+            // Save NIP (empty or validated 10 digits).
+            update_post_meta($postId, '_places_nip', $nip);
         }
 
         // Save region.
@@ -355,8 +355,8 @@ class PlacesPostType extends PostTypeBase
      */
     public static function getFullAddress(int $postId): string
     {
-        $street = get_post_meta($postId, '_place_street', true);
-        $number = get_post_meta($postId, '_place_number', true);
+        $street = get_post_meta($postId, '_places_street', true);
+        $number = get_post_meta($postId, '_places_number', true);
         
         if (empty($street) || empty($number)) {
             return '';
@@ -374,10 +374,10 @@ class PlacesPostType extends PostTypeBase
     public static function getPlaceDetails(int $postId): array
     {
         return [
-            'street' => get_post_meta($postId, '_place_street', true),
-            'number' => get_post_meta($postId, '_place_number', true),
-            'nip'    => get_post_meta($postId, '_place_nip', true),
-            'region' => get_post_meta($postId, '_place_region', true),
+            'street' => get_post_meta($postId, '_places_street', true),
+            'number' => get_post_meta($postId, '_places_number', true),
+            'nip'    => get_post_meta($postId, '_places_nip', true),
+            'region' => get_post_meta($postId, '_places_region', true),
         ];
     }
 
@@ -399,7 +399,12 @@ class PlacesPostType extends PostTypeBase
         $postsPerPage = isset($_POST['posts_per_page']) ? absint($_POST['posts_per_page']) : get_option('posts_per_page');
         $category = isset($_POST['category']) ? sanitize_text_field($_POST['category']) : '';
         $orderby = isset($_POST['orderby']) ? sanitize_text_field($_POST['orderby']) : 'date';
-        $order = isset($_POST['order']) ? sanitize_text_field($_POST['order']) : 'DESC';
+        $order = isset($_POST['order']) ? strtoupper(sanitize_text_field($_POST['order'])) : 'DESC';
+        
+        // Validate order parameter.
+        if (!in_array($order, ['ASC', 'DESC'])) {
+            $order = 'DESC';
+        }
 
         // Build query arguments.
         $args = [
@@ -495,26 +500,24 @@ class PlacesPostType extends PostTypeBase
                 <?php echo !empty($placeDetails['nip']) ? esc_html($placeDetails['nip']) : '—'; ?>
             </td>
             <td class="places-col-actions">
-                <a href="<?php echo esc_url(get_permalink($postId)); ?>" class="places-view-btn">
-                    <?php esc_html_e('View', 'mytheme'); ?>
-                </a>
-                <?php if (current_user_can('edit_post', $postId)) : ?>
-                    <?php 
-                    $post_slug = get_post_field('post_name', $postId);
-                    $edit_url = home_url('/places/' . $post_slug . '/edit/');
-                    
-                    // Debug: Log the URL being generated
-                    if (defined('WP_DEBUG') && WP_DEBUG) {
-                        error_log("Edit URL for post {$postId}: {$edit_url}");
-                    }
-                    ?>
-                    <a href="<?php echo esc_url($edit_url); ?>" 
-                       class="places-edit-btn" 
-                       title="<?php esc_attr_e('Edit', 'mytheme'); ?>"
-                       data-debug-url="<?php echo esc_attr($edit_url); ?>">
-                        <?php esc_html_e('Edit', 'mytheme'); ?>
+                <div class="places-actions-wrapper">
+                    <a href="<?php echo esc_url(get_permalink($postId)); ?>" class="places-action-btn places-view-btn" title="<?php esc_attr_e('View', 'mytheme'); ?>">
+                        <span class="dashicons dashicons-visibility"></span>
+                        <span class="btn-text"><?php esc_html_e('View', 'mytheme'); ?></span>
                     </a>
-                <?php endif; ?>
+                    <?php if (current_user_can('edit_post', $postId)) : ?>
+                        <?php 
+                        $post_slug = get_post_field('post_name', $postId);
+                        $edit_url = home_url('/places/' . $post_slug . '/edit/');
+                        ?>
+                        <a href="<?php echo esc_url($edit_url); ?>" 
+                           class="places-action-btn places-edit-btn" 
+                           title="<?php esc_attr_e('Edit', 'mytheme'); ?>">
+                            <span class="dashicons dashicons-edit"></span>
+                            <span class="btn-text"><?php esc_html_e('Edit', 'mytheme'); ?></span>
+                        </a>
+                    <?php endif; ?>
+                </div>
             </td>
         </tr>
         <?php
@@ -567,6 +570,9 @@ class PlacesPostType extends PostTypeBase
         $number = isset($_POST['number']) ? sanitize_text_field($_POST['number']) : '';
         $region = isset($_POST['region']) ? sanitize_text_field($_POST['region']) : '';
         $nip = isset($_POST['nip']) ? sanitize_text_field($_POST['nip']) : '';
+        
+        // Clean NIP - remove all non-digit characters.
+        $nip = preg_replace('/[^0-9]/', '', $nip);
 
         // Validate required fields.
         if (empty($title) || empty($street) || empty($number) || empty($region)) {
@@ -574,8 +580,8 @@ class PlacesPostType extends PostTypeBase
             return;
         }
 
-        // Validate NIP if provided.
-        if (!empty($nip) && !preg_match('/^\d{10}$/', $nip)) {
+        // Validate NIP if provided (must be empty or exactly 10 digits after cleaning).
+        if (!empty($nip) && strlen($nip) !== 10) {
             wp_send_json_error(['message' => __('NIP must be 10 digits', 'mytheme')]);
             return;
         }

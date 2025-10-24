@@ -30,25 +30,53 @@ mytheme/
 │   ├── post-types/
 │   │   ├── class-post-type-base.php     # Base abstract class for CPTs
 │   │   └── class-places-post-type.php   # Places custom post type
+│   ├── templates/
+│   │   ├── single-places.php            # Single place template
+│   │   ├── edit-place.php               # Frontend edit template
+│   │   ├── archive-places.php           # Places archive template
+│   │   ├── taxonomy-places_category.php # Category taxonomy template
+│   │   └── README.md                    # Templates documentation
 │   ├── class-autoloader.php              # PSR-4 autoloader
-│   └── class-theme.php                   # Main theme class
-├── assets/
-│   ├── js/
-│   │   ├── main.js                       # Frontend JavaScript
-│   │   └── admin.js                      # Admin JavaScript
-│   └── css/
-│       ├── admin.css                     # Admin styles
-│       ├── places-admin.css              # Places admin styles
-│       └── places.css                    # Places frontend styles
+│   ├── class-theme.php                   # Main theme class
+│   └── class-templates.php               # Template loader class
+├── src/
+│   ├── js/                               # Source JavaScript files
+│   │   ├── main.js                       # Main JS
+│   │   ├── admin.js                      # Admin JS
+│   │   └── places.js                     # Places JS
+│   └── scss/                             # Source SCSS files
+│       ├── _variables.scss               # SCSS variables
+│       ├── _mixins.scss                  # SCSS mixins
+│       ├── admin.scss                    # Admin styles
+│       ├── places-admin.scss             # Places admin styles
+│       └── places.scss                   # Places frontend styles
+├── dist/                                 # Compiled assets (auto-generated)
+│   ├── js/                               # Minified JavaScript
+│   └── css/                              # Minified CSS
 ├── functions.php                         # Theme setup
 ├── style.css                             # Theme stylesheet
 ├── index.php                             # Main template
 ├── header.php                            # Header template
-├── footer.php                            # Footer template
-├── single-places.php                     # Single place template
-├── archive-places.php                    # Places archive template
-└── taxonomy-places_category.php          # Places category template
+└── footer.php                            # Footer template
 ```
+
+## Templates
+
+Custom templates are stored in `inc/templates/` directory and loaded automatically by the `Templates` class.
+
+### Template Loader
+
+The `MyTheme\Templates` class handles loading custom templates:
+- Uses WordPress `template_include` filter
+- Automatically loads templates based on conditions
+- Provides fallback to default templates
+
+### Available Templates
+
+- **single-places.php** - Single place view with table layout
+- **edit-place.php** - Frontend editing interface for places
+- **archive-places.php** - Places archive with sortable table
+- **taxonomy-places_category.php** - Places category taxonomy archive
 
 ## Custom Post Types
 

@@ -103,7 +103,7 @@
          * Initialize sorting
          */
         initSorting: function () {
-            $(document).on('click', '.places-sort-btn', this.handleSort.bind(this));
+            $(document).on('click', '.places-table th.sortable', this.handleSort.bind(this));
         },
 
         /**
@@ -114,8 +114,8 @@
         handleSort: function (e) {
             e.preventDefault();
 
-            const $btn = $(e.currentTarget);
-            const column = $btn.data('column');
+            const $th = $(e.currentTarget);
+            const column = $th.data('sort');
 
             if (this.orderby === column) {
                 this.order = this.order === 'asc' ? 'desc' : 'asc';
@@ -132,10 +132,10 @@
          * Update sort indicators
          */
         updateSortIndicators: function () {
-            $('.places-sort-btn').removeClass('active asc desc');
-            $(`.places-sort-btn[data-column="${this.orderby}"]`)
-                .addClass('active')
-                .addClass(this.order);
+            $('.places-table th.sortable').removeClass('sorted sorted-asc sorted-desc');
+            $(`.places-table th.sortable[data-sort="${this.orderby}"]`)
+                .addClass('sorted')
+                .addClass(`sorted-${this.order}`);
         },
 
         /**
@@ -143,7 +143,14 @@
          */
         reloadTable: function () {
             this.currentPage = 1;
-            this.loading = false;
+            this.loading = true;
+
+            // Show loading indicator
+            const $tbody = $('.places-table tbody');
+            const $loadMoreBtn = $('.places-load-more-btn');
+            
+            $tbody.addClass('loading');
+            $tbody.html('<tr class="loading-row"><td colspan="6"><span class="spinner"></span> Loading...</td></tr>');
 
             $.ajax({
                 url: mythemeData.ajaxUrl,
@@ -157,12 +164,25 @@
                 },
                 success: (response) => {
                     if (response.success && response.data.html) {
-                        $('.places-table tbody').html(response.data.html);
-                        $('.places-load-more-btn').show();
+                        $tbody.html(response.data.html);
+                        
+                        // Update load more button visibility
+                        if (response.data.has_more) {
+                            $loadMoreBtn.show();
+                        } else {
+                            $loadMoreBtn.hide();
+                        }
+                    } else {
+                        $tbody.html('<tr class="error-row"><td colspan="6">Error loading places</td></tr>');
                     }
                 },
                 error: () => {
                     console.error('Error reloading table');
+                    $tbody.html('<tr class="error-row"><td colspan="6">Error loading places</td></tr>');
+                },
+                complete: () => {
+                    $tbody.removeClass('loading');
+                    this.loading = false;
                 }
             });
         }

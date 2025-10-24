@@ -15,14 +15,138 @@
         margin-bottom: $spacing-xxl;
     }
 
-    .places-thumbnail {
-        margin: $spacing-lg 0;
+    .places-details-wrapper {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: $spacing-xxl;
+        margin-bottom: $spacing-xxl;
 
+        @media (min-width: 768px) {
+            grid-template-columns: 300px 1fr;
+        }
+    }
+
+    .places-thumbnail {
         img {
             width: 100%;
             height: auto;
             border-radius: $border-radius-lg;
             @include box-shadow;
+        }
+    }
+
+    .places-details-table-wrapper {
+        background: $color-bg;
+        border-radius: $border-radius-lg;
+        @include box-shadow;
+        overflow: hidden;
+    }
+
+    .places-details-table {
+        width: 100%;
+        border-collapse: collapse;
+
+        tbody {
+            tr {
+                border-bottom: 1px solid $color-border;
+
+                &:last-child {
+                    border-bottom: none;
+                }
+
+                &:nth-child(even) {
+                    background-color: $color-bg-lighter;
+                }
+            }
+
+            th {
+                padding: $spacing-md $spacing-lg;
+                text-align: left;
+                font-weight: $font-weight-semibold;
+                color: $color-text;
+                background: $color-bg-light;
+                width: 40%;
+                vertical-align: middle;
+
+                .dashicons {
+                    color: $color-primary;
+                    font-size: $font-size-lg;
+                    vertical-align: middle;
+                    margin-right: $spacing-xs;
+                }
+            }
+
+            td {
+                padding: $spacing-md $spacing-lg;
+                color: $color-text-light;
+                vertical-align: middle;
+
+                a {
+                    color: $color-primary;
+                    text-decoration: none;
+                    @include transition(color);
+
+                    &:hover {
+                        color: $color-primary-dark;
+                        text-decoration: underline;
+                    }
+                }
+            }
+        }
+    }
+
+    .entry-content {
+        margin-bottom: $spacing-xxl;
+
+        h2 {
+            margin-bottom: $spacing-lg;
+            padding-bottom: $spacing-sm;
+            border-bottom: 2px solid $color-border;
+        }
+    }
+
+    .places-actions {
+        display: flex;
+        gap: $spacing-md;
+        padding-top: $spacing-lg;
+        border-top: 2px solid $color-border;
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: $spacing-xs;
+            padding: $spacing-sm $spacing-lg;
+            border-radius: $border-radius-sm;
+            font-weight: $font-weight-medium;
+            text-decoration: none;
+            @include transition(all);
+            @include box-shadow($shadow-sm);
+
+            .dashicons {
+                font-size: $font-size-lg;
+            }
+
+            &.btn-secondary {
+                background: $color-secondary;
+                color: $color-bg;
+
+                &:hover {
+                    background: $color-secondary-dark;
+                    transform: translateY(-1px);
+                    @include box-shadow($shadow-md);
+                }
+            }
+
+            &.btn-primary {
+                background: $color-primary;
+                color: $color-bg;
+
+                &:hover {
+                    background: $color-primary-dark;
+                    transform: translateY(-1px);
+                    @include box-shadow($shadow-md);
+                }
+            }
         }
     }
 }
@@ -231,17 +355,52 @@
     }
 }
 
-/* Action buttons */
-.places-view-btn,
-.places-edit-btn {
-    @include button-base;
-    margin-right: $spacing-xs;
+/* Action buttons wrapper */
+.places-actions-wrapper {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+}
 
-    &:last-child {
-        margin-right: 0;
+/* Action buttons base styles */
+.places-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    color: $color-bg;
+    text-decoration: none;
+    border-radius: $border-radius-sm;
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
+    @include transition(all);
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    @include box-shadow($shadow-sm);
+
+    &:hover {
+        transform: translateY(-1px);
+        @include box-shadow($shadow-md);
+        text-decoration: none;
+        color: $color-bg;
+    }
+
+    &:active {
+        transform: translateY(0);
+        @include box-shadow($shadow-sm);
+    }
+
+    .dashicons {
+        font-size: $font-size-xl;
+        width: $font-size-xl;
+        height: $font-size-xl;
+        line-height: 1;
     }
 }
 
+/* View button */
 .places-view-btn {
     background: $color-primary;
 
@@ -250,6 +409,7 @@
     }
 }
 
+/* Edit button */
 .places-edit-btn {
     background: $color-secondary;
 
@@ -393,6 +553,36 @@
 }
 
 @include respond-to(sm) {
+    .places-single {
+        .places-details-wrapper {
+            grid-template-columns: 1fr;
+        }
+
+        .places-details-table {
+            tbody {
+                th {
+                    width: 35%;
+                    font-size: $font-size-sm;
+                    padding: $spacing-sm $spacing-md;
+                }
+
+                td {
+                    font-size: $font-size-sm;
+                    padding: $spacing-sm $spacing-md;
+                }
+            }
+        }
+
+        .places-actions {
+            flex-direction: column;
+
+            .btn {
+                justify-content: center;
+                width: 100%;
+            }
+        }
+    }
+
     .places-info {
         grid-template-columns: 1fr;
         gap: $spacing-md;
@@ -434,10 +624,19 @@
         font-size: $font-size-lg;
     }
 
-    .places-view-btn,
-    .places-edit-btn {
-        padding: $spacing-xs 12px;
+    .places-actions-wrapper {
+        gap: 6px;
+    }
+
+    .places-action-btn {
+        padding: 6px $spacing-sm;
         font-size: $font-size-sm;
+
+        .dashicons {
+            font-size: $font-size-md;
+            width: $font-size-md;
+            height: $font-size-md;
+        }
     }
 }
 
@@ -514,6 +713,22 @@
             &::before {
                 display: none;
             }
+        }
+    }
+
+    // Show only icons on very small screens
+    .places-action-btn {
+        padding: 8px;
+        gap: 0;
+
+        .btn-text {
+            display: none;
+        }
+
+        .dashicons {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
         }
     }
 }

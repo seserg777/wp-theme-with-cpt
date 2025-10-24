@@ -112,11 +112,15 @@ class Theme
             // Enqueue places styles and scripts on places pages.
             if (is_post_type_archive('places') || 
                 is_singular('places') || 
-                is_tax('places_category')) {
+                is_tax('places_category') ||
+                get_query_var('edit_place')) {
+                // Enqueue dashicons for action buttons.
+                wp_enqueue_style('dashicons');
+                
                 wp_enqueue_style(
                     'mytheme-places',
                     get_template_directory_uri() . '/dist/css/places-styles.min.css',
-                    [],
+                    ['dashicons'],
                     '1.0.0'
                 );
 

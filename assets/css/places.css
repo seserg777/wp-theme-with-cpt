@@ -213,22 +213,52 @@
     text-decoration: underline;
 }
 
-/* Action buttons */
-.places-view-btn,
-.places-edit-btn {
-    display: inline-block;
-    padding: 6px 16px;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 4px;
-    font-size: 13px;
-    font-weight: 500;
-    transition: background 0.2s;
-    border: none;
-    cursor: pointer;
-    margin-right: 5px;
+/* Action buttons wrapper */
+.places-actions-wrapper {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
 }
 
+/* Action buttons base styles */
+.places-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.places-action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+    text-decoration: none;
+    color: #fff;
+}
+
+.places-action-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.places-action-btn .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    line-height: 1;
+}
+
+/* View button */
 .places-view-btn {
     background: #2271b1;
 }
@@ -237,16 +267,13 @@
     background: #135e96;
 }
 
+/* Edit button */
 .places-edit-btn {
     background: #50575e;
 }
 
 .places-edit-btn:hover {
     background: #3c434a;
-}
-
-.places-edit-btn:last-child {
-    margin-right: 0;
 }
 
 /* Load more section */
@@ -424,9 +451,19 @@
         font-size: 15px;
     }
 
-    .places-view-btn {
-        padding: 5px 12px;
+    .places-actions-wrapper {
+        gap: 6px;
+    }
+
+    .places-action-btn {
+        padding: 6px 10px;
         font-size: 12px;
+    }
+
+    .places-action-btn .dashicons {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
     }
 }
 
@@ -500,5 +537,21 @@
 
     .places-col-actions::before {
         display: none;
+    }
+
+    /* Show only icons on very small screens */
+    .places-action-btn .btn-text {
+        display: none;
+    }
+
+    .places-action-btn {
+        padding: 8px;
+        gap: 0;
+    }
+
+    .places-action-btn .dashicons {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
     }
 }
